@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_share/screens/home_screen.dart';
+import 'package:shopping_share/screens/register_screen.dart';
 
 class MyRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        //return MaterialPageRoute(builder: (_) => const HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case '/login':
         //return MaterialPageRoute(builder: (_) => const LoginScreen());
       case '/register':
-        //return MaterialPageRoute(builder: (_) => const RegisterScreen());
+        return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case '/registersuccess':
         //return MaterialPageRoute(builder: (_) => const RegisterSuccess());
       case '/home':

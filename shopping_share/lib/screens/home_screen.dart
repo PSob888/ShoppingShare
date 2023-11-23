@@ -1,8 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_share/providers/AuthProvider.dart' as AuthProvider;
 
-class HomeScreen extends StatelessWidget{
+
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Dispose of the controllers to free up resources when the widget is removed
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,47 +41,141 @@ class HomeScreen extends StatelessWidget{
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             // Your logo or image
-            Image.asset('assets/images/logo.png', width: 220, height: 220), // Replace with the actual path to your logo image.
+            Image.asset('assets/images/cart.png', width: 150, height: 150), // Replace with the actual path to your logo image.
+            Text(
+              'Shopping Share',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
 
             // Add some spacing
             SizedBox(height: 60),
 
-            // Use FractionallySizedBox to make the buttons 80% of the screen width
+            // Email field
             FractionallySizedBox(
-              widthFactor: 0.8,
+              widthFactor: 0.75,
               child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
+                height: buttonHeight, // Set the input field height
+                child: TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromRGBO(217, 217, 217, 1),
+                    hintText: 'Email',
+                  ),
+                ),
+              ),
+            ),
+
+            // Add spacing between email and password fields
+            SizedBox(height: 20),
+
+            // Password field
+            FractionallySizedBox(
+              widthFactor: 0.75,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
+                height: buttonHeight, // Set the input field height
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true, // To hide the password
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromRGBO(217, 217, 217, 1),
+                    hintText: 'Haslo',
+                  ),
+                ),
+              ),
+            ),
+
+            // Add spacing between the input fields and buttons
+            SizedBox(height: 20),
+
+            // Login button
+            FractionallySizedBox(
+              widthFactor: 0.75,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
                 height: buttonHeight, // Set the button height
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle the login button press
-                    Navigator.pushNamed(context, '/login');
+                  onPressed: () async {
+                    // Get the text from the email and password fields
+                    String email = emailController.text;
+                    String password = passwordController.text;
+
+                    // You can now use the email and password variables as needed.
+                    AuthProvider.AuthProvider authProvider = Provider.of<AuthProvider.AuthProvider>(context, listen: false);
+
+                    await authProvider.signInWithEmailAndPassword(email, password);
+
+                    if (authProvider.user != null) {
+                      Navigator.pushNamed(context, '/home');
+                    }
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(buttonColor),
                   ),
-                  child: Text('Login'),
+                  child: Text('Zaloguj'),
                 ),
               ),
             ),
 
             // Add spacing between the buttons
-            SizedBox(height: 40),
+            SizedBox(height: 20),
 
-            FractionallySizedBox(
-              widthFactor: 0.8,
-              child: Container(
-                height: buttonHeight, // Set the button height
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle the register button press
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(buttonColor),
-                  ),
-                  child: Text('Register'),
-                ),
+            Text(
+              'Nie masz konta?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
               ),
+            ),
+            RichText(text: TextSpan(
+              text: 'Zarejestruj sie',
+              recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.pushNamed(context, '/register');
+                    },
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             ),
           ],
         ),

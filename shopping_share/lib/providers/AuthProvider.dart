@@ -19,12 +19,6 @@ class AuthProvider extends ChangeNotifier {
       );
       _user = userCredential.user;
 
-      void markPlayerAsConnected(String roomId, String playerId) {
-        FirebaseFirestore.instance.collection('users').doc(_user!.uid).update({
-          'isConnected': true,
-        });
-}
-
       // Fetch additional user data from Firestore
       await _fetchUserData();
 
