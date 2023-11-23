@@ -56,120 +56,122 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Color(0xFF141D26),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            // Your smaller logo or image
-            Image.asset('assets/images/cart.png',
-                width: 150,
-                height:
-                    150), // Replace with the actual path to your smaller logo image.
-            Text(
-              'Shopping Share',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            // Add some spacing
-            SizedBox(height: 60),
-
-            // Email field
-            FractionallySizedBox(
-              widthFactor: 0.75,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // Shadow position
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // Your smaller logo or image
+              Image.asset('assets/images/cart.png',
+                  width: 150,
+                  height:
+                      150), // Replace with the actual path to your smaller logo image.
+              Text(
+                'Shopping Share',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
                 ),
-                height: buttonHeight, // Set the input field height
-                child: TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromRGBO(217, 217, 217, 1),
-                    hintText: 'Email',
+              ),
+
+              // Add some spacing
+              SizedBox(height: 60),
+
+              // Email field
+              FractionallySizedBox(
+                widthFactor: 0.75,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // Shadow position
+                      ),
+                    ],
+                  ),
+                  height: buttonHeight, // Set the input field height
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
+                      hintText: 'Email',
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Add spacing between email and nickname fields
-            SizedBox(height: 20),
+              // Add spacing between email and nickname fields
+              SizedBox(height: 20),
 
-            // Nickname field
-            FractionallySizedBox(
-              widthFactor: 0.75,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // Shadow position
+              // Nickname field
+              FractionallySizedBox(
+                widthFactor: 0.75,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // Shadow position
+                      ),
+                    ],
+                  ),
+                  height: buttonHeight, // Set the input field height
+                  child: TextField(
+                    controller: nicknameController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
+                      hintText: 'Haslo',
                     ),
-                  ],
-                ),
-                height: buttonHeight, // Set the input field height
-                child: TextField(
-                  controller: nicknameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromRGBO(217, 217, 217, 1),
-                    hintText: 'Haslo',
                   ),
                 ),
               ),
-            ),
 
-            // Add spacing between nickname and password fields
-            SizedBox(height: 20),
+              // Add spacing between nickname and password fields
+              SizedBox(height: 20),
 
-            // Registration button
-            FractionallySizedBox(
-              widthFactor: 0.75,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // Shadow position
-                    ),
-                  ],
-                ),
-                height: buttonHeight, // Set the button height
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle the registration button press
-                    String email = emailController.text;
-                    String password = nicknameController.text;
-
-                    //dodac checkowanie czy hasla sa takie same itd.
-
-                    registerUser(email, password, context);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(buttonColor),
+              // Registration button
+              FractionallySizedBox(
+                widthFactor: 0.75,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // Shadow position
+                      ),
+                    ],
                   ),
-                  child: Text('Register'),
+                  height: buttonHeight, // Set the button height
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle the registration button press
+                      String email = emailController.text;
+                      String password = nicknameController.text;
+
+                      //dodac checkowanie czy hasla sa takie same itd.
+
+                      registerUser(email, password, context);
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(buttonColor),
+                    ),
+                    child: Text('Register'),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
