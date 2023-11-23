@@ -24,11 +24,10 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AuthProvider(),
       child: MaterialApp(
-      title: 'BattleShips',
+      title: 'ShoppingShare',
       debugShowCheckedModeBanner: false,
       theme: themeData(),
       // initialRoute:
-      //     '/ship-deployment', // TODO: remove line, only for ship deployment testing
       onGenerateRoute: MyRouter.generateRoute, // class containing app's routes
     )
     );

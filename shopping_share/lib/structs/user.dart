@@ -11,7 +11,7 @@ class User {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'nickname': email,
+      'email': email,
     };
   }
 }

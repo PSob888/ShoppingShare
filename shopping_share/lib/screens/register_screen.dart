@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //TODO: move this to AuthProvider.dart
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-Future<void> registerUser(String email, String password, String nickname, String repeatPassword, BuildContext context) async {
+Future<void> registerUser(String email, String password, BuildContext context) async {
   try {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -16,10 +16,7 @@ Future<void> registerUser(String email, String password, String nickname, String
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({
-        'friends': [],
-        'nickname': nickname,
-        'points': 0,
-        'isAvailable': false,
+        'email': email,
       });
     Navigator.pushNamed(context, '/registersuccess');
   } catch (e) {
@@ -57,27 +54,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: Color(0xFF141D26),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               // Your smaller logo or image
-              Image.asset('assets/images/logo.png', width: 150, height: 150), // Replace with the actual path to your smaller logo image.
-      
+              Image.asset('assets/images/cart.png', width: 150, height: 150), // Replace with the actual path to your smaller logo image.
+              Text(
+                'Shopping Share',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
               // Add some spacing
-              SizedBox(height: 20),
+              SizedBox(height: 60),
       
               // Email field
               FractionallySizedBox(
-                widthFactor: 0.8,
+                widthFactor: 0.75,
                 child: Container(
+                  decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
                   height: buttonHeight, // Set the input field height
                   child: TextField(
                     controller: emailController,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
                       hintText: 'Email',
                     ),
                   ),
@@ -89,15 +104,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
       
               // Nickname field
               FractionallySizedBox(
-                widthFactor: 0.8,
+                widthFactor: 0.75,
                 child: Container(
+                  decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
                   height: buttonHeight, // Set the input field height
                   child: TextField(
                     controller: nicknameController,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Nickname',
+                      fillColor: const Color.fromRGBO(217, 217, 217, 1),
+                      hintText: 'Haslo',
                     ),
                   ),
                 ),
@@ -106,62 +132,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
               // Add spacing between nickname and password fields
               SizedBox(height: 20),
       
-              // Password field
-              FractionallySizedBox(
-                widthFactor: 0.8,
-                child: Container(
-                  height: buttonHeight, // Set the input field height
-                  child: TextField(
-                    controller: passwordController,
-                    obscureText: true, // To hide the password
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Password',
-                    ),
-                  ),
-                ),
-              ),
-      
-              // Add spacing between password and repeat password fields
-              SizedBox(height: 20),
-      
-              // Repeat Password field
-              FractionallySizedBox(
-                widthFactor: 0.8,
-                child: Container(
-                  height: buttonHeight, // Set the input field height
-                  child: TextField(
-                    controller: repeatPasswordController,
-                    obscureText: true, // To hide the repeat password
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Repeat Password',
-                    ),
-                  ),
-                ),
-              ),
-      
-              // Add spacing between the input fields and buttons
-              SizedBox(height: 40),
-      
               // Registration button
               FractionallySizedBox(
-                widthFactor: 0.8,
+                widthFactor: 0.75,
                 child: Container(
+                  decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // Shadow position
+                    ),
+                  ],
+                ),
                   height: buttonHeight, // Set the button height
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle the registration button press
                       String email = emailController.text;
-                      String password = passwordController.text;
-                      String nickname = nicknameController.text;
-                      String repeatPassword = repeatPasswordController.text;
+                      String password = nicknameController.text;
       
                       //dodac checkowanie czy hasla sa takie same itd.
       
-                      registerUser(email, password, nickname, repeatPassword, context);
+                      registerUser(email, password, context);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(buttonColor),
@@ -172,7 +167,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ],
           ),
-        ),
       ),
     );
   }

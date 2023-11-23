@@ -164,19 +164,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 15,
               ),
             ),
-            RichText(text: TextSpan(
-              text: 'Zarejestruj sie',
-              recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      Navigator.pushNamed(context, '/register');
-                    },
-              style: TextStyle(
+            TextButton(
+                child: const Text('Zarejestruj się',
+                style: TextStyle(
                 color: Colors.white,
-                fontSize: 15,
                 fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),),
+                onPressed: () async {
+                  debugPrint("Register button pressed");
+                  Navigator.pushNamed(context, "/register");
+                },
               ),
-            ),
-            ),
           ],
         ),
       ),
