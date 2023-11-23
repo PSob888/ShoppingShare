@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           email, password);
 
                       if (authProvider.user != null) {
-                        Navigator.pushNamed(context, '/home');
+                        Navigator.pushNamed(context, '/shopping_lists');
                       }
                     },
                     style: ButtonStyle(
