@@ -5,6 +5,7 @@ import 'package:shopping_share/screens/register_screen.dart';
 import 'package:shopping_share/screens/main_screen.dart';
 import 'package:shopping_share/screens/settings_screen.dart';
 import 'package:shopping_share/screens/shopping_list_screen.dart';
+import 'package:shopping_share/screens/register_success.dart';
 
 class MyRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -15,6 +16,8 @@ class MyRouter {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case '/register':
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case '/registersuccess':
+        return MaterialPageRoute(builder: (_) => const RegisterSuccess());
       case '/settings':
         return MaterialPageRoute(builder: (_) => SettingsScreen());
       case '/account':
