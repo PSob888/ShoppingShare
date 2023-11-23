@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 Color primaryColor = const Color(0xFF141D26);
 Color backgroundColor = primaryColor;
 
-const Color availShipsSectionBackgroundColor = Colors.grey;
+const Color bottomBarSelectedColor = Color(0xFFE68342);
 
 ThemeData themeData() {
   return ThemeData(
