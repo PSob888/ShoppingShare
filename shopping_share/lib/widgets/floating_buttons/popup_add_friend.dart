@@ -26,7 +26,7 @@ class AddFriendPopup extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // TODO: Add product to the list
+              // TODO: Add a friend
               Navigator.pop(context); // Close the popup
             },
             child: const Text('Dodaj'),

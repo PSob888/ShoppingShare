@@ -26,7 +26,7 @@ class CreateNewShoppingListPopup extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // TODO: Add product to the list
+              // TODO: Add create new shopping list
               Navigator.pop(context); // Close the popup
             },
             child: const Text('Dodaj'),
