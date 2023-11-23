@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  User? _user;
+  static User? _user;
   Map<String, dynamic>? _userData;
 
   User? get user => _user;
   Map<String, dynamic>? get userData => _userData;
+
+  String? getUserId() {
+    return _user?.uid;
+  }
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     try {
