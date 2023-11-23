@@ -5,7 +5,6 @@ class RegisterSuccess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final buttonColor = Color(0xFF446792); // Define the button color
     final buttonHeight = 50.0;
     return Scaffold(
@@ -21,12 +20,13 @@ class RegisterSuccess extends StatelessWidget {
                 color: Colors.white, // Text color
               ),
             ),
-            SizedBox(height: 20), // Add some spacing between the text and the button
+            SizedBox(
+                height: 20), // Add some spacing between the text and the button
             // Registration button
-              FractionallySizedBox(
-                widthFactor: 0.75,
-                child: Container(
-                  decoration: BoxDecoration(
+            FractionallySizedBox(
+              widthFactor: 0.75,
+              child: Container(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -37,18 +37,18 @@ class RegisterSuccess extends StatelessWidget {
                     ),
                   ],
                 ),
-                  height: buttonHeight, // Set the button height
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(buttonColor),
-                    ),
-                    child: Text('Register'),
+                height: buttonHeight, // Set the button height
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(buttonColor),
                   ),
+                  child: Text('Zaloguj się'),
                 ),
               ),
+            ),
           ],
         ),
       ),
