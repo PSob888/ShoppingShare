@@ -15,7 +15,8 @@ class AuthProvider extends ChangeNotifier {
     return _user?.uid;
   }
 
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<void> signInWithEmailAndPassword(
+      String email, String password, BuildContext context) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -29,7 +30,13 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // Handle login failure
-      print('Login failed: $e');
+      print('Błąd logowania: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Błąd logowania: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

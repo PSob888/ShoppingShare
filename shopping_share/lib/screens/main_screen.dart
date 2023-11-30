@@ -21,7 +21,8 @@ class MainScreen extends StatelessWidget {
             Consumer<AuthProvider>(
               builder: (context, authProvider, child) {
                 // Check if the user is authenticated
-                if (authProvider.user != null && authProvider.userData != null) {
+                if (authProvider.user != null &&
+                    authProvider.userData != null) {
                   //Stringnickname = authProvider.userData!['nickname'];
 
                   // Display the user's nickname
@@ -29,7 +30,6 @@ class MainScreen extends StatelessWidget {
                     'Welcome!',
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   );
-                  
                 } else {
                   // If the user is not authenticated, show a login button
                   return FractionallySizedBox(
@@ -41,7 +41,8 @@ class MainScreen extends StatelessWidget {
                           Navigator.pushNamed(context, '/login');
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(buttonColor),
+                          backgroundColor:
+                              MaterialStateProperty.all(buttonColor),
                         ),
                         child: Text('Login'),
                       ),

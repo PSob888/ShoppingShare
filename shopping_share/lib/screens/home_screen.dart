@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               listen: false);
 
                       await authProvider.signInWithEmailAndPassword(
-                          email, password);
+                          email, password, context);
 
                       if (authProvider.user != null) {
                         Navigator.pushNamed(context, '/shopping_lists');
