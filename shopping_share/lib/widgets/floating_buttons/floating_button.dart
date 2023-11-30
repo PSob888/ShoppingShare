@@ -11,8 +11,8 @@ class CustomFAB extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: onPressed, // Customize the icon as needed
-      backgroundColor: backgroundColor,
-      child: const Icon(Icons.add), // Customize the FAB color
+      backgroundColor: floatingButtonColor,
+      child: const Icon(Icons.add, color: Color(0xFF446792), size: 40), // Customize the FAB color
     );
   }
 }

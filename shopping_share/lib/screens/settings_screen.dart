@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_share/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
 
@@ -28,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final buttonHeight = 50.0;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text('Ustawienia'),
       ),

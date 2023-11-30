@@ -58,7 +58,7 @@ class BottomBar extends StatelessWidget {
       ],
       currentIndex: currentIndex,
       unselectedItemColor: const Color.fromARGB(255, 225, 225, 225),
-      backgroundColor: backgroundColor,
+      backgroundColor: primaryColor,
       selectedItemColor: bottomBarSelectedColor,
       onTap: onItemTapped,
     );

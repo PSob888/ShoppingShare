@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_share/theme.dart';
 import 'package:shopping_share/providers/AuthProvider.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
@@ -11,6 +12,7 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: BottomBar(currentIndex: 1),
       body: FriendListStream(),
+      backgroundColor: backgroundColor,
       floatingActionButton: CustomFAB(
         onPressed: () => FABCallbacks.addFriend(context),
       ),
