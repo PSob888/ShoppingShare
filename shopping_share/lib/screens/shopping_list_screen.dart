@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_share/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
@@ -13,6 +14,7 @@ class ShoppingListsScreen extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: const BottomBar(currentIndex: 0),
       body: ShoppingListsStream(),
+      backgroundColor: backgroundColor,
       floatingActionButton: CustomFAB(
         onPressed: () => FABCallbacks.createNewShoppingList(context),
       ),
@@ -73,7 +75,7 @@ class ShoppingListsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.blue,
+      color: primaryColor,
       margin: EdgeInsets.all(8.0),
       child: Padding(
         padding: EdgeInsets.all(16.0),
