@@ -21,7 +21,50 @@ Future<void> registerUser(
     });
     Navigator.pushNamed(context, '/registersuccess');
   } catch (e) {
-    // Handle registration failure
+    if (e is FirebaseAuthException) {
+      if (e.code == 'weak-password') {
+        // Handle weak password error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Błąd rejestracji: Za słabe hasło'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (e.code == 'email-already-in-use') {
+        // Handle email already in use error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Błąd rejestracji: Istnieje już konto z takim emailem'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (e.code == 'invalid-email') {
+        // Handle invalid email format error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Błąd rejestracji: Źle sformatowany email'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        // Handle other types of errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Błąd rejestracji: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      // Handle other types of errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Błąd rejestracji: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
