@@ -16,6 +16,7 @@ Future<void> main() async {
   runApp(const MyApp());
 
   final status = await Permission.location.request();
+  await Permission.notification.request();
 }
 
 class MyApp extends StatelessWidget {
