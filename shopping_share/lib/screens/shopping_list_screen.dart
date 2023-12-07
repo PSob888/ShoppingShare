@@ -6,6 +6,8 @@ import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
 import 'package:shopping_share/providers/AuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
 import 'package:shopping_share/screens/list_screen.dart';
+import 'package:intl/intl.dart';
+
 
 class ShoppingListsScreen extends StatefulWidget {
   const ShoppingListsScreen({Key? key}) : super(key: key);
@@ -95,8 +97,7 @@ class ShoppingListsStream extends StatelessWidget {
 class ShoppingListsListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
 
-  const ShoppingListsListView({Key? key, required this.snapshot})
-      : super(key: key);
+  const ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +107,10 @@ class ShoppingListsListView extends StatelessWidget {
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
         String listName = shoppingLists[index]['name'] ?? '';
+        Timestamp createdAtTimestamp = shoppingLists[index]['created_at'] ?? Timestamp.now();
+        DateTime createdAt = createdAtTimestamp.toDate();
+        int itemAmount = shoppingLists[index]['itemAmount'] ?? 0;
+        bool isDone = shoppingLists[index]['isDone'] ?? false;
         String documentId = shoppingLists[index].id;
 
         return GestureDetector(
@@ -140,6 +145,23 @@ class ShoppingListsListView extends StatelessWidget {
                   listName,
                   style: TextStyle(color: Colors.white, fontSize: 18.0),
                 ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Utworzono: ${_formatDate(createdAt)}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'liczba produktów: $itemAmount',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Status: ${isDone ? "Zakończona" : "Trwająca"}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -147,4 +169,10 @@ class ShoppingListsListView extends StatelessWidget {
       },
     );
   }
+
+  String _formatDate(DateTime date) {
+    // Format the DateTime as needed
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+  }
 }
+

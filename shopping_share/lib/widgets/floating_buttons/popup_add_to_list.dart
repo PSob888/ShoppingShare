@@ -66,23 +66,48 @@ class _AddToListPopupState extends State<AddToListPopup> {
     );
   }
 
-  Future<void> addProductToFirestore() async {
-    String name = nameController.text;
-    String quantity = quantityController.text;
-    String description = descriptionController.text;
+Future<void> addProductToFirestore() async {
+  String name = nameController.text;
+  String quantity = quantityController.text;
+  String description = descriptionController.text;
 
-    CollectionReference itemsCollection =
-        FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items');
+  CollectionReference itemsCollection = FirebaseFirestore.instance
+      .collection('lists')
+      .doc(widget.listUid)
+      .collection('items');
 
-    await itemsCollection.add({
-      'listId': widget.listUid,
-      'name': name,
-      'quantity': quantity,
-      'description': description,
-    });
+  // Get the current itemAmount from Firestore
+  int currentItemAmount = 0; // You may want to set a default value
+  await FirebaseFirestore.instance
+      .collection('lists')
+      .doc(widget.listUid)
+      .get()
+      .then((doc) {
+    if (doc.exists) {
+      currentItemAmount = doc['itemAmount'] ?? 0;
+    }
+  });
 
-    nameController.clear();
-    quantityController.clear();
-    descriptionController.clear();
-  }
+  // Increment the itemAmount
+  int newItemAmount = currentItemAmount + 1;
+
+  // Update the itemAmount in Firestore
+  await FirebaseFirestore.instance
+      .collection('lists')
+      .doc(widget.listUid)
+      .update({'itemAmount': newItemAmount});
+
+  // Add the new item to the collection
+  await itemsCollection.add({
+    'listId': widget.listUid,
+    'name': name,
+    'quantity': quantity,
+    'description': description,
+  });
+
+  // Clear the text controllers
+  nameController.clear();
+  quantityController.clear();
+  descriptionController.clear();
+}
 }
