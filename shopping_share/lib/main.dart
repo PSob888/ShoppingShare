@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'routes.dart';
 import 'package:shopping_share/theme.dart';
@@ -13,6 +14,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
+
+  final status = await Permission.location.request();
 }
 
 class MyApp extends StatelessWidget {

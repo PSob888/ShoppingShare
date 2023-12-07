@@ -40,6 +40,9 @@ dependencies:
   firebase_auth: ^4.14.1
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.3.6
+  open_street_map_search_and_pick: ^0.1.0
+  geolocator: ^10.1.0
+  permission_handler: ^11.0.1
 
 dev_dependencies:
   flutter_test:
