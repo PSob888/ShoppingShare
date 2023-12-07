@@ -5,14 +5,7 @@ import 'package:shopping_share/widgets/bottom_navbar.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
 import 'package:shopping_share/providers/AuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
-
-import 'package:flutter/material.dart';
-import 'package:shopping_share/theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shopping_share/widgets/bottom_navbar.dart';
-import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
-import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
+import 'package:shopping_share/screens/list_screen.dart';
 
 class ShoppingListsScreen extends StatefulWidget {
   const ShoppingListsScreen({Key? key}) : super(key: key);
@@ -31,7 +24,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
       body: Column(
         children: [
           Container(
-            color: Colors.grey, // Set the background color here
+            color: Colors.grey,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -77,7 +70,6 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
   }
 }
 
-
 class ShoppingListsStream extends StatelessWidget {
   AuthProvider _authProvider = AuthProvider();
   @override
@@ -94,7 +86,6 @@ class ShoppingListsStream extends StatelessWidget {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        // If the data is available, build the list view
         return ShoppingListsListView(snapshot: snapshot);
       },
     );
@@ -109,38 +100,46 @@ class ShoppingListsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Extract shopping lists from the snapshot
     List<DocumentSnapshot> shoppingLists = snapshot.data!.docs;
 
     return ListView.builder(
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
-        // Extract data for each shopping list
         String listName = shoppingLists[index]['name'] ?? '';
         String documentId = shoppingLists[index].id;
 
-        return Dismissible(
-          key: Key(documentId),
-          onDismissed: (direction) {
-            // Delete the item from Firestore when dismissed
-            FirebaseFirestore.instance.collection('lists').doc(documentId).delete();
+        return GestureDetector(
+          onTap: () {
+            // Navigate to the list screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ListScreen(listName: listName),
+              ),
+            );
           },
-          background: Container(
-            color: Color(0xFF8C2A35), // Background color when swiping
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(left: 16.0),
-            child: Icon(
-              Icons.delete,
-              color: Colors.white,
+          child: Dismissible(
+            key: Key(documentId),
+            onDismissed: (direction) {
+              FirebaseFirestore.instance.collection('lists').doc(documentId).delete();
+            },
+            background: Container(
+              color: Color(0xFF8C2A35),
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 16.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
             ),
-          ),
-          child: Container(
-            margin: EdgeInsets.all(8.0), // Add margins to every side
-            child: ListTile(
-              tileColor: primaryColor,
-              title: Text(
-                listName,
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+            child: Container(
+              margin: EdgeInsets.all(8.0),
+              child: ListTile(
+                tileColor: primaryColor,
+                title: Text(
+                  listName,
+                  style: TextStyle(color: Colors.white, fontSize: 18.0),
+                ),
               ),
             ),
           ),
