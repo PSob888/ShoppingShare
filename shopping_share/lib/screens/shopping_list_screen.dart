@@ -6,14 +6,69 @@ import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
 import 'package:shopping_share/providers/AuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
 
-class ShoppingListsScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:shopping_share/theme.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shopping_share/widgets/bottom_navbar.dart';
+import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
+import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
+
+class ShoppingListsScreen extends StatefulWidget {
   const ShoppingListsScreen({Key? key}) : super(key: key);
+
+  @override
+  _ShoppingListsScreenState createState() => _ShoppingListsScreenState();
+}
+
+class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
+  String selectedButton = "my";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const BottomBar(currentIndex: 0),
-      body: ShoppingListsStream(),
+      body: Column(
+        children: [
+          Container(
+            color: Colors.grey, // Set the background color here
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = "my";
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: selectedButton == "my" ? Colors.blue : Colors.grey,
+                    ),
+                    child: Text("My"),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = "shared";
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: selectedButton == "shared" ? Colors.blue : Colors.grey,
+                    ),
+                    child: Text("Shared"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ShoppingListsStream(),
+          ),
+        ],
+      ),
       backgroundColor: backgroundColor,
       floatingActionButton: CustomFAB(
         onPressed: () => FABCallbacks.createNewShoppingList(context),
@@ -21,6 +76,7 @@ class ShoppingListsScreen extends StatelessWidget {
     );
   }
 }
+
 
 class ShoppingListsStream extends StatelessWidget {
   AuthProvider _authProvider = AuthProvider();
@@ -61,29 +117,35 @@ class ShoppingListsListView extends StatelessWidget {
       itemBuilder: (context, index) {
         // Extract data for each shopping list
         String listName = shoppingLists[index]['name'] ?? '';
-        return ShoppingListsCard(text: listName);
+        String documentId = shoppingLists[index].id;
+
+        return Dismissible(
+          key: Key(documentId),
+          onDismissed: (direction) {
+            // Delete the item from Firestore when dismissed
+            FirebaseFirestore.instance.collection('lists').doc(documentId).delete();
+          },
+          background: Container(
+            color: Color(0xFF8C2A35), // Background color when swiping
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(left: 16.0),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+          child: Container(
+            margin: EdgeInsets.all(8.0), // Add margins to every side
+            child: ListTile(
+              tileColor: primaryColor,
+              title: Text(
+                listName,
+                style: TextStyle(color: Colors.white, fontSize: 18.0),
+              ),
+            ),
+          ),
+        );
       },
-    );
-  }
-}
-
-class ShoppingListsCard extends StatelessWidget {
-  final String text;
-
-  const ShoppingListsCard({Key? key, required this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: primaryColor,
-      margin: EdgeInsets.all(8.0),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 18.0),
-        ),
-      ),
     );
   }
 }
