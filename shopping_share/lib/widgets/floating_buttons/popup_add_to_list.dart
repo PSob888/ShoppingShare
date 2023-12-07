@@ -1,48 +1,88 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'package:shopping_share/theme.dart';
+class AddToListPopup extends StatefulWidget {
+  final String listUid;
 
-class AddToListPopup extends StatelessWidget {
+  AddToListPopup({required this.listUid});
+
+  @override
+  _AddToListPopupState createState() => _AddToListPopupState();
+}
+
+class _AddToListPopupState extends State<AddToListPopup> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Dodaj nowy produkt',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Dodaj nowy produkt',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          const TextField(
-            decoration: InputDecoration(
-              hintText: 'Nazwa',
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: 'Nazwa',
+              ),
             ),
-          ),
-          const TextField(
-            decoration: InputDecoration(
-              hintText: 'Ilość',
+            TextField(
+              controller: quantityController,
+              decoration: InputDecoration(
+                hintText: 'Ilość',
+              ),
             ),
-          ),
-          const TextField(
-            decoration: InputDecoration(
-              hintText: 'Krótki opis',
+            TextField(
+              controller: descriptionController,
+              decoration: InputDecoration(
+                hintText: 'Krótki opis',
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // TODO: Add product to the list
-              Navigator.pop(context); // Close the popup
-            },
-            child: const Text('Dodaj'),
-          ),
-        ],
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                await addProductToFirestore();
+                Navigator.pop(context); // Close the popup
+              },
+              child: const Text('Dodaj'),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> addProductToFirestore() async {
+    String name = nameController.text;
+    String quantity = quantityController.text;
+    String description = descriptionController.text;
+
+    CollectionReference itemsCollection =
+        FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items');
+
+    await itemsCollection.add({
+      'listId': widget.listUid,
+      'name': name,
+      'quantity': quantity,
+      'description': description,
+    });
+
+    nameController.clear();
+    quantityController.clear();
+    descriptionController.clear();
   }
 }

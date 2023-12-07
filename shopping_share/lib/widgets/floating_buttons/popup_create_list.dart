@@ -13,7 +13,7 @@ class CreateNewShoppingListPopup extends StatefulWidget {
 class _CreateNewShoppingListPopupState
     extends State<CreateNewShoppingListPopup> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  TextEditingController emailController = TextEditingController();
+  TextEditingController nameController = TextEditingController(); // Changed variable name to nameController
   AuthProvider _authProvider = AuthProvider();
 
   Future<void> createNewShoppingList(
@@ -34,41 +34,46 @@ class _CreateNewShoppingListPopupState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Stwórz nową listę',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Stwórz nową listę',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              hintText: 'Nazwa',
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: 'Nazwa',
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () async {
-              // TODO: Add create new shopping list
-              String? userId = _authProvider.user?.uid;
-              if (userId != null) {
-                String shoppingListName =
-                    emailController.text; // get the value from the TextField
-                await createNewShoppingList(userId, shoppingListName);
-              }
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                // TODO: Add create new shopping list
+                String? userId = _authProvider.user?.uid;
+                if (userId != null) {
+                  String shoppingListName =
+                      nameController.text; // Use the updated variable name
+                  await createNewShoppingList(userId, shoppingListName);
+                }
 
-              Navigator.pop(context); // Close the popup
-            },
-            child: const Text('Dodaj'),
-          ),
-        ],
+                Navigator.pop(context); // Close the popup
+              },
+              child: const Text('Dodaj'),
+            ),
+          ],
+        ),
       ),
     );
   }

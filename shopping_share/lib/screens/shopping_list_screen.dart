@@ -114,7 +114,7 @@ class ShoppingListsListView extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ListScreen(listName: listName),
+                builder: (context) => ListScreen(listName: listName, listUid: documentId),
               ),
             );
           },
