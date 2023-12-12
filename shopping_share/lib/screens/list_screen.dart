@@ -57,15 +57,22 @@ class ListStream extends StatelessWidget {
   }
 }
 
-class ListListView extends StatelessWidget {
+class ListListView extends StatefulWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
   final String listUid;
 
   const ListListView({Key? key, required this.snapshot, required this.listUid}) : super(key: key);
 
   @override
+  _ListListViewState createState() => _ListListViewState();
+}
+
+class _ListListViewState extends State<ListListView> {
+  Map<String, bool> itemCheckedState = {};
+
+  @override
   Widget build(BuildContext context) {
-    List<DocumentSnapshot> shoppingLists = snapshot.data!.docs;
+    List<DocumentSnapshot> shoppingLists = widget.snapshot.data!.docs;
 
     return ListView.builder(
       itemCount: shoppingLists.length,
@@ -75,20 +82,22 @@ class ListListView extends StatelessWidget {
         String itemDescription = shoppingLists[index]['description'] ?? '';
         String documentId = shoppingLists[index].id;
 
+        bool isChecked = shoppingLists[index]['bought'] ?? false;
+
         return GestureDetector(
           onTap: () {
-            // Navigate to the item details screen
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => ItemDetailsScreen(itemName: itemName, itemQuantity: itemQuantity, itemDescription: itemDescription),
-            //   ),
-            // );
+            setState(() {
+              itemCheckedState[documentId] = !isChecked;
+              // Update the 'bought' field in Firestore based on the checkbox state
+              FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).update({
+                'bought': !isChecked,
+              });
+            });
           },
           child: Dismissible(
             key: Key(documentId),
             onDismissed: (direction) {
-              FirebaseFirestore.instance.collection('lists').doc(listUid).collection('items').doc(documentId).delete();
+              FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).delete();
             },
             background: Container(
               color: Color(0xFF8C2A35),
@@ -101,8 +110,9 @@ class ListListView extends StatelessWidget {
             ),
             child: Container(
               margin: EdgeInsets.all(8.0),
-              child: ListTile(
+              child: CheckboxListTile(
                 tileColor: primaryColor,
+                activeColor: checkboxColor,
                 title: Text(
                   itemName,
                   style: TextStyle(color: Colors.white, fontSize: 18.0),
@@ -111,6 +121,17 @@ class ListListView extends StatelessWidget {
                   'Sztuk: $itemQuantity\nOpis: $itemDescription',
                   style: TextStyle(color: Colors.white),
                 ),
+                value: isChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    itemCheckedState[documentId] = value!;
+                    // Update the 'bought' field in Firestore based on the checkbox state
+                    FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).update({
+                      'bought': value,
+                    });
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.trailing,
               ),
             ),
           ),
@@ -119,4 +140,3 @@ class ListListView extends StatelessWidget {
     );
   }
 }
-

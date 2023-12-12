@@ -103,6 +103,7 @@ Future<void> addProductToFirestore() async {
     'name': name,
     'quantity': quantity,
     'description': description,
+    'bought': false,
   });
 
   // Clear the text controllers
