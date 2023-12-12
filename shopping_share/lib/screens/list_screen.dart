@@ -142,7 +142,7 @@ class _ListListViewState extends State<ListListView> {
                     tileColor: primaryColor,
                     title: Row(
                       children: [
-                        Image.network('https://source.unsplash.com/random/?$itemName', width: 50, height: 50), // Adjust width and height as needed
+                        Image.network('https://source.unsplash.com/random/?$itemName', width: 60, height: 60), // Adjust width and height as needed
                         SizedBox(width: 16), // Add spacing between image and text
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
