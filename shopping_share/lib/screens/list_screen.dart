@@ -177,11 +177,11 @@ class _ListListViewState extends State<ListListView> {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Enter Amount Spent'),
+        title: Text('Wpisz ile wydałeś'),
         content: TextField(
           controller: amountController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Amount'),
+          decoration: InputDecoration(labelText: 'PLN'),
           onChanged: (value) {
             // Handle amount change
           },
@@ -191,7 +191,7 @@ class _ListListViewState extends State<ListListView> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('Cancel'),
+            child: Text('Anuluj'),
           ),
           TextButton(
             onPressed: () {
@@ -214,6 +214,7 @@ class _ListListViewState extends State<ListListView> {
     });
   }
   //update amount spent
-  widget.amountSpent = amountSpent!;
+  if (amountSpent != null && amountSpent.isNotEmpty)
+    widget.amountSpent = amountSpent;
 }
 }
