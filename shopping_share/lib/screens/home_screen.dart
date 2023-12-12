@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(buttonColor),
                     ),
-                    child: Text('Zaloguj'),
+                    child: Text('Zaloguj', style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ),

@@ -101,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('OK'),
+                                    child: Text('OK', style: TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               );
@@ -120,7 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('OK'),
+                                    child: Text('OK', style: TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               );
@@ -140,7 +140,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('OK'),
+                                  child: Text('OK', style: TextStyle(color: Colors.white)),
                                 ),
                               ],
                             );
@@ -160,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: Text('OK'),
+                                child: Text('OK', style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           );
@@ -171,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(buttonColor),
                   ),
-                  child: Text('Zmień hasło'),
+                  child: Text('Zmień hasło', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),

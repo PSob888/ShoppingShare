@@ -71,7 +71,7 @@ class _CreateNewShoppingListPopupState
 
                 Navigator.pop(context); // Close the popup
               },
-              child: const Text('Dodaj'),
+              child: const Text('Dodaj', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
