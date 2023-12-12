@@ -116,12 +116,7 @@ class ShoppingListsListView extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             // Navigate to the list screen
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ListScreen(listName: listName, listUid: documentId),
-              ),
-            );
+            Navigator.pushNamed(context, '/list', arguments: {'parameter1': listName, 'parameter2': documentId});
           },
           child: Dismissible(
             key: Key(documentId),
