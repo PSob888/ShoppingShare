@@ -34,7 +34,8 @@ class MyRouter {
           // Access parameters and pass them to the ListScreen widget
           final String parameter1 = arguments['parameter1'];
           final String parameter2 = arguments['parameter2'];
-          return MaterialPageRoute(builder: (_) => ListScreen(listName: parameter1, listUid: parameter2));
+          final String parameter3 = arguments['parameter3'];
+          return MaterialPageRoute(builder: (_) => ListScreen(listName: parameter1, listUid: parameter2, amountSpent: parameter3));
         } else {
           // If no parameters are available, create a default ListScreen
           return MaterialPageRoute(builder: (_) => const HomeScreen());

@@ -25,6 +25,7 @@ class _CreateNewShoppingListPopupState
         'created_at': DateTime.now(),
         'itemAmount': 0,
         'isDone': false,
+        'amountSpent': '0'
         // Add other properties as needed
       });
     } catch (e) {

@@ -112,11 +112,12 @@ class ShoppingListsListView extends StatelessWidget {
         int itemAmount = shoppingLists[index]['itemAmount'] ?? 0;
         bool isDone = shoppingLists[index]['isDone'] ?? false;
         String documentId = shoppingLists[index].id;
+        String amountSpend = shoppingLists[index]['amountSpent'];
 
         return GestureDetector(
           onTap: () {
             // Navigate to the list screen
-            Navigator.pushNamed(context, '/list', arguments: {'parameter1': listName, 'parameter2': documentId});
+            Navigator.pushNamed(context, '/list', arguments: {'parameter1': listName, 'parameter2': documentId, 'parameter3': amountSpend});
           },
           child: Dismissible(
             key: Key(documentId),
