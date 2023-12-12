@@ -138,44 +138,55 @@ class _ListListViewState extends State<ListListView> {
                 ),
                 child: Container(
                   margin: EdgeInsets.all(8.0),
-                  child: CheckboxListTile(
+                  child: ListTile(
                     tileColor: primaryColor,
-                    activeColor: checkboxColor,
-                    title: Text(
-                      itemName,
-                      style: TextStyle(color: Colors.white, fontSize: 18.0),
+                    title: Row(
+                      children: [
+                        Image.network('https://source.unsplash.com/random/?$itemName', width: 60, height: 60), // Adjust width and height as needed
+                        SizedBox(width: 16), // Add spacing between image and text
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              itemName,
+                              style: TextStyle(color: Colors.white, fontSize: 18.0),
+                            ),
+                            Text(
+                              'Sztuk: $itemQuantity\nOpis: $itemDescription',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    subtitle: Text(
-                      'Sztuk: $itemQuantity\nOpis: $itemDescription',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    value: isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        itemCheckedState[documentId] = value!;
-                        // Update the 'bought' field in Firestore based on the checkbox state
-                        FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).update({
-                          'bought': value,
+                    trailing: Checkbox(
+                      activeColor: checkboxColor,
+                      value: isChecked,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          itemCheckedState[documentId] = value!;
+                          // Update the 'bought' field in Firestore based on the checkbox state
+                          FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).update({
+                            'bought': value,
+                          });
+                          // Check if last item checked and show popup
+                          bool allItemsBought = false;
+                          int a = 0;
+                          for (var item in shoppingLists) {
+                            a++;
+                          }
+                          if (a == shoppingLists.length) {
+                            allItemsBought = true;
+                          }
+                          print(allItemsBought);
+                          print(value);
+                          if (allItemsBought && shoppingLists.length > 0 && value == true) {
+                            promptShown = true;
+                            showAmountPrompt(context);
+                          }
                         });
-                        //check if last item checked and show popup
-
-                        bool allItemsBought = false;
-                        int a=0;
-                        for(var item in shoppingLists) {
-                          a++;
-                        }
-                        if(a==shoppingLists.length){
-                          allItemsBought = true;
-                        }
-                        print(allItemsBought);
-                        print(value);
-                        if (allItemsBought && shoppingLists.length > 0 && value == true) {
-                          promptShown = true;
-                          showAmountPrompt(context);
-                        }
-                      });   
-                    },
-                    controlAffinity: ListTileControlAffinity.trailing,
+                      },
+                    ),
                   ),
                 ),
               ),
