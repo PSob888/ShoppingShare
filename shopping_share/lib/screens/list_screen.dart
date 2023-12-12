@@ -51,7 +51,7 @@ class ListStream extends StatelessWidget {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        return ListListView(snapshot: snapshot);
+        return ListListView(snapshot: snapshot, listUid: listUid);
       },
     );
   }
@@ -59,8 +59,9 @@ class ListStream extends StatelessWidget {
 
 class ListListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
+  final String listUid;
 
-  const ListListView({Key? key, required this.snapshot}) : super(key: key);
+  const ListListView({Key? key, required this.snapshot, required this.listUid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +88,7 @@ class ListListView extends StatelessWidget {
           child: Dismissible(
             key: Key(documentId),
             onDismissed: (direction) {
-              //FirebaseFirestore.instance.collection('lists').doc(documentId).delete();
+              FirebaseFirestore.instance.collection('lists').doc(listUid).collection('items').doc(documentId).delete();
             },
             background: Container(
               color: Color(0xFF8C2A35),
