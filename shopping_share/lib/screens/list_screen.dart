@@ -157,7 +157,23 @@ class _ListListViewState extends State<ListListView> {
                         FirebaseFirestore.instance.collection('lists').doc(widget.listUid).collection('items').doc(documentId).update({
                           'bought': value,
                         });
-                      });
+                        //check if last item checked and show popup
+
+                        bool allItemsBought = false;
+                        int a=0;
+                        for(var item in shoppingLists) {
+                          a++;
+                        }
+                        if(a==shoppingLists.length){
+                          allItemsBought = true;
+                        }
+                        print(allItemsBought);
+                        print(value);
+                        if (allItemsBought && shoppingLists.length > 0 && value == true) {
+                          promptShown = true;
+                          showAmountPrompt(context);
+                        }
+                      });   
                     },
                     controlAffinity: ListTileControlAffinity.trailing,
                   ),
