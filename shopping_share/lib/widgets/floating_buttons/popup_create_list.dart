@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/structs/shoppinglist.dart';
 import 'package:shopping_share/theme.dart';
@@ -14,7 +14,7 @@ class _CreateNewShoppingListPopupState
     extends State<CreateNewShoppingListPopup> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController nameController = TextEditingController(); // Changed variable name to nameController
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
 
   Future<void> createNewShoppingList(
       String userId, String shoppingListName) async {

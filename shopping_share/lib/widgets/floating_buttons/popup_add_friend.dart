@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 
 import 'package:shopping_share/theme.dart';
 
@@ -12,7 +12,7 @@ class AddFriendPopup extends StatefulWidget {
 class _AddFriendPopupState extends State<AddFriendPopup> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController emailController = TextEditingController();
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
 
   Future<void> addFriend(String senderID, String receiverID) async {
     try {

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/theme.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
 
 class ListScreen extends StatelessWidget {
@@ -28,7 +28,7 @@ class ListScreen extends StatelessWidget {
 }
 
 class ListStream extends StatelessWidget {
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
   final String listUid;
   final String amountSpent;
 

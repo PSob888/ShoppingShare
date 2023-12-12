@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -18,7 +18,7 @@ class MainScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Consumer<AuthProvider>(
+            Consumer<MyAuthProvider>(
               builder: (context, authProvider, child) {
                 // Check if the user is authenticated
                 if (authProvider.user != null &&
