@@ -13,13 +13,34 @@ class AccountScreen extends StatelessWidget {
       bottomNavigationBar: BottomBar(currentIndex: 1),
       body: Column(
         children: [
-          // Display friend requests and friends
-          Expanded(
-            child: FriendListStream(),
+          SizedBox(height: 32),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Znajomi',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            ),
           ),
-          // Add space between the two lists
+          Expanded(
+            child: FriendListStream(isFriendRequest: false),
+          ),
           SizedBox(height: 16),
-          // TODO: Display the list of accepted friends here using FriendListStream or another appropriate widget
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Zaproszenia do znajomych',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: FriendListStream(isFriendRequest: true),
+          ),
         ],
       ),
       backgroundColor: backgroundColor,
@@ -31,15 +52,20 @@ class AccountScreen extends StatelessWidget {
 }
 
 class FriendListStream extends StatelessWidget {
+  final bool isFriendRequest;
+
+  FriendListStream({required this.isFriendRequest});
+
   AuthProvider _authProvider = AuthProvider();
+
   @override
   Widget build(BuildContext context) {
-    String? userId = _authProvider.user?.uid;
+    String? userId = _authProvider.user?.uid ?? '';
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('friend_reqs')
-          .where('receiverID', isEqualTo: userId)
-          .where('status', isEqualTo: false)
+          .where(isFriendRequest ? 'receiverID' : 'status',
+              isEqualTo: isFriendRequest ? userId : true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -50,8 +76,23 @@ class FriendListStream extends StatelessWidget {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
+        // Filter out accepted friend requests if displaying the "Zaproszenia do znajomych" list
+        List<QueryDocumentSnapshot> filteredList = snapshot.data!.docs
+            .where((doc) => isFriendRequest ? doc['status'] == false : true)
+            .toList();
+
+        if (filteredList.isEmpty) {
+          return Center(
+              child: Text(
+                  'No ${isFriendRequest ? 'friend requests' : 'accepted friends'} available.'));
+        }
+
         // If the data is available, build the list view
-        return FriendListView(snapshot: snapshot);
+        return FriendListView(
+          snapshot: snapshot,
+          isFriendRequest: isFriendRequest,
+          filteredList: filteredList,
+        );
       },
     );
   }
@@ -59,23 +100,28 @@ class FriendListStream extends StatelessWidget {
 
 class FriendListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
+  final bool isFriendRequest;
+  final List<QueryDocumentSnapshot> filteredList;
 
-  const FriendListView({Key? key, required this.snapshot}) : super(key: key);
+  const FriendListView({
+    Key? key,
+    required this.snapshot,
+    required this.isFriendRequest,
+    required this.filteredList,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<DocumentSnapshot> friendList = snapshot.data!.docs;
-
     return ListView.builder(
-      itemCount: friendList.length,
+      itemCount: filteredList.length,
       itemBuilder: (context, index) {
         Map<String, dynamic> item =
-            friendList[index].data() as Map<String, dynamic>;
+            filteredList[index].data() as Map<String, dynamic>;
 
-        bool isFriendRequest = item['status'] == false;
+        bool isFriendRequestItem = item['status'] == false;
 
         return FriendListTile(
-          isFriendRequest: isFriendRequest,
+          isFriendRequest: isFriendRequestItem,
           friendData: item,
         );
       },
@@ -95,10 +141,17 @@ class FriendListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider _authProvider = AuthProvider();
+    String currentUserId = _authProvider.user?.uid ?? '';
+
     return Card(
       child: ListTile(
         title: FutureBuilder<String>(
-          future: getEmailFromId(friendData['senderID']),
+          future: getEmailFromId(
+            friendData['senderID'] == currentUserId
+                ? friendData['receiverID']
+                : friendData['senderID'],
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Text('Loading...');
@@ -130,7 +183,18 @@ class FriendListTile extends StatelessWidget {
                   ),
                 ],
               )
-            : null,
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      removeFriend(
+                          friendData['senderID'], friendData['receiverID']);
+                    },
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -146,8 +210,35 @@ class FriendListTile extends StatelessWidget {
       for (QueryDocumentSnapshot doc in friendRequests.docs) {
         doc.reference.update({'status': true});
       }
+
+      await addFriendToUser(senderId, receiverId);
+      await addFriendToUser(receiverId, senderId);
     } catch (e) {
       print('Error accepting friend request: $e');
+    }
+  }
+
+  Future<void> addFriendToUser(String userId, String friendId) async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        List<String> friends = List<String>.from(userSnapshot['friends']);
+
+        if (!friends.contains(friendId)) {
+          friends.add(friendId);
+
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .update({'friends': friends});
+        }
+      }
+    } catch (e) {
+      print('Error adding friend to user: $e');
     }
   }
 
@@ -164,6 +255,59 @@ class FriendListTile extends StatelessWidget {
       }
     } catch (e) {
       print('Error denying friend request: $e');
+    }
+  }
+
+  Future<void> removeFriend(String userId, String friendId) async {
+    try {
+      await removeFriendFromUser(userId, friendId);
+      await removeFriendFromUser(friendId, userId);
+
+      QuerySnapshot friendRequests = await FirebaseFirestore.instance
+          .collection('friend_reqs')
+          .where('senderID', isEqualTo: userId)
+          .where('receiverID', isEqualTo: friendId)
+          .get();
+
+      for (QueryDocumentSnapshot doc in friendRequests.docs) {
+        doc.reference.delete();
+      }
+
+      friendRequests = await FirebaseFirestore.instance
+          .collection('friend_reqs')
+          .where('senderID', isEqualTo: friendId)
+          .where('receiverID', isEqualTo: userId)
+          .get();
+
+      for (QueryDocumentSnapshot doc in friendRequests.docs) {
+        doc.reference.delete();
+      }
+    } catch (e) {
+      print('Error removing friend: $e');
+    }
+  }
+
+  Future<void> removeFriendFromUser(String userId, String friendId) async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        List<String> friends = List<String>.from(userSnapshot['friends']);
+
+        if (friends.contains(friendId)) {
+          friends.remove(friendId);
+
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .update({'friends': friends});
+        }
+      }
+    } catch (e) {
+      print('Error removing friend from user: $e');
     }
   }
 
