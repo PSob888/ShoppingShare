@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shopping_share/screens/friend_access_tile.dart';
 import 'package:shopping_share/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
@@ -343,16 +344,10 @@ class ShoppingListsListView extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: friends.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(friends[index]['email'] ?? 'Brak emaila'),
-                        trailing: IconButton(
-                          icon: Icon(Icons.share),
-                          onPressed: () {
-                            // Logika udostępniania listy znajomemu
-                            _shareWithFriend(documentId,
-                                friends[index]['friendID'], listName);
-                          },
-                        ),
+                      return FriendAccessTile(
+                        friendId: friends[index]['friendID'] ?? '',
+                        documentId: documentId,
+                        friendEmail: friends[index]['email'] ?? 'Brak emaila',
                       );
                     },
                   ),
@@ -373,30 +368,6 @@ class ShoppingListsListView extends StatelessWidget {
     );
   }
 
-  void _shareWithFriend(String documentId, String? friendId, String listName) {
-    if (friendId != null) {
-      print('Udostępnianie listy "$listName" znajomemu o ID: $friendId');
-      shareList(documentId, _authProvider.user!.uid, friendId);
-      showToast("Znajomy został dodany do listy $listName", duration: 2);
-    }
-  }
-
-  Future<void> shareList(
-      String listId, String ownerId, String sharedWithUserId) async {
-    DocumentReference listRef =
-        FirebaseFirestore.instance.collection('lists').doc(listId);
-    DocumentReference ownerRef =
-        FirebaseFirestore.instance.collection('users').doc(ownerId);
-    DocumentReference sharedWithUserRef =
-        FirebaseFirestore.instance.collection('users').doc(sharedWithUserId);
-
-    await FirebaseFirestore.instance.collection('shared_lists').add({
-      'listId': listRef,
-      'ownerId': ownerRef,
-      'sharedWithUserId': sharedWithUserRef,
-    });
-  }
-
   Future<List<DocumentSnapshot>> getSharedLists(String userId) async {
     DocumentReference userRef =
         FirebaseFirestore.instance.collection('users').doc(userId);
@@ -407,24 +378,6 @@ class ShoppingListsListView extends StatelessWidget {
         .get();
 
     return querySnapshot.docs;
-  }
-
-  Future<void> unshareList(String sharedListDocumentId) async {
-    await FirebaseFirestore.instance
-        .collection('shared_lists')
-        .doc(sharedListDocumentId)
-        .delete();
-  }
-
-  void showToast(String msg, {int duration = 3}) {
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: duration,
-        backgroundColor: Colors.grey[800],
-        textColor: Colors.white,
-        fontSize: 16.0);
   }
 
   String _formatDate(DateTime date) {
