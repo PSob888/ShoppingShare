@@ -105,8 +105,7 @@ class ShoppingListsListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
   Offset? _tapPosition;
 
-  const ShoppingListsListView({Key? key, required this.snapshot})
-      : super(key: key);
+  ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +115,6 @@ class ShoppingListsListView extends StatelessWidget {
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
         String listName = shoppingLists[index]['name'] ?? '';
-        Timestamp createdAtTimestamp =
-            shoppingLists[index]['created_at'] ?? Timestamp.now();
         Timestamp createdAtTimestamp =
             shoppingLists[index]['created_at'] ?? Timestamp.now();
         DateTime createdAt = createdAtTimestamp.toDate();
@@ -226,14 +223,14 @@ class ShoppingListsListView extends StatelessWidget {
           //_cloneItem();
         } else if (value == 'share') {
           print('Share clicked');
-          _shareItem(documentId);
+          _shareShoppingList(documentId);
           // print documentId;
         }
       });
     }
   }
 
-  void _shareItem(String documentId) {
+  void _shareShoppingList(String documentId) async {
     print('Udostępniam listę o ID: $documentId');
     String? userId = _authProvider.user?.uid;
 
@@ -242,63 +239,33 @@ class ShoppingListsListView extends StatelessWidget {
       return;
     }
 
-    FirebaseFirestore.instance
+    // Pobierz listę ID znajomych
+    QuerySnapshot friendsQuery = await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .collection('friends')
-        .get() // używamy get() zamiast snapshots(), aby pobrać dane jednorazowo
-        .then((QuerySnapshot querySnapshot) {
-      if (querySnapshot.docs.isEmpty) {
-        print('Lista znajomych jest pusta.');
+        .get();
+
+    // Przechodzimy przez wszystkich znajomych
+    for (var friend in friendsQuery.docs) {
+      String friendUserId =
+          friend['friendID']; // zakładamy, że pole nazywa się 'userId'
+
+      // Pobierz dane użytkownika po ID
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friendUserId)
+          .get();
+
+      String? friendEmail =
+          userDoc['email']; // zakładamy, że pole nazywa się 'email'
+      if (friendEmail != null) {
+        print('Znajomy ID: $friendUserId, email: $friendEmail');
       } else {
-        for (var doc in querySnapshot.docs) {
-          // Zapiszemy ID i email znajomego
-          String friendId = doc.id;
-          String? email = doc['email']; // zakładamy, że pole nazywa się 'email'
-          print('firend ID: $friendId, email: $email');
-        }
+        print('Nie znaleziono emaila dla znajomego o ID: $friendUserId');
       }
-    }).catchError((error) {
-      print('Wystąpił błąd podczas pobierania listy znajomych: $error');
-    });
+    }
   }
-
-  // void _shareItem(String documentId) {
-  //   print('Udostępniam listę o ID: $documentId');
-  //   String? userId = _authProvider.user?.uid;
-
-  //   if (userId == null) {
-  //     print('Użytkownik nie jest zalogowany.');
-  //     return;
-  //   }
-
-  //   FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(userId)
-  //       .collection('friends')
-  //       .get() // używamy get() zamiast snapshots(), aby pobrać dane jednorazowo
-  //       .then((QuerySnapshot querySnapshot) {
-  //     if (querySnapshot.docs.isEmpty) {
-  //       print('Lista znajomych jest pusta.');
-  //     } else {
-  //       for (var doc in querySnapshot.docs) {
-  //         print(doc.data()); // Wypisuje dane każdego dokumentu znajomego
-  //       }
-  //     }
-  //   }).catchError((error) {
-  //     print('Wystąpił błąd podczas pobierania listy znajomych: $error');
-  //   });
-  // }
-
-  // void _shareItem(String documentId) {
-  //   print('Udostępniam listę o ID: $documentId');
-  //   String? userId = _authProvider.user?.uid;
-  //   FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(userId)
-  //       .collection('friends')
-  //       .snapshots();
-  // }
 
   String _formatDate(DateTime date) {
     // Format the DateTime as needed
