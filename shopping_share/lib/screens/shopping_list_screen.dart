@@ -63,7 +63,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
               ),
             ),
             Expanded(
-              child: ShoppingListsStream(),
+              child: ShoppingListsStream(selectedButton: selectedButton),
             ),
           ],
         ),
@@ -77,41 +77,77 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
 }
 
 class ShoppingListsStream extends StatelessWidget {
-  MyAuthProvider _authProvider = MyAuthProvider();
+  final String selectedButton;
+  final MyAuthProvider _authProvider = MyAuthProvider();
+
+  ShoppingListsStream({Key? key, required this.selectedButton})
+      : super(key: key);
+
+  Stream<List<DocumentSnapshot>> _getSharedListsStream(String? userId) {
+    return FirebaseFirestore.instance
+        .collection('shared_lists')
+        .where('sharedWithUserId',
+            isEqualTo:
+                FirebaseFirestore.instance.collection('users').doc(userId))
+        .snapshots()
+        .asyncMap((sharedListSnapshot) async {
+      List<DocumentSnapshot> listSnapshots = [];
+      for (var sharedListDoc in sharedListSnapshot.docs) {
+        DocumentReference listRef = sharedListDoc['listId'];
+        DocumentSnapshot listSnapshot = await listRef.get();
+        listSnapshots.add(listSnapshot);
+      }
+      return listSnapshots;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String? userId = _authProvider.user?.uid;
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
+    Stream<List<DocumentSnapshot>> stream;
+
+    if (selectedButton == "my") {
+      stream = FirebaseFirestore.instance
           .collection('lists')
           .where('user_id', isEqualTo: userId)
-          .snapshots(),
+          .snapshots()
+          .map((snapshot) => snapshot.docs);
+    } else {
+      stream = _getSharedListsStream(userId);
+    }
+
+    return StreamBuilder<List<DocumentSnapshot>>(
+      stream: stream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
 
-        if (snapshot.hasError) {
+        if (snapshot.hasError || !snapshot.hasData) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        return ShoppingListsListView(snapshot: snapshot);
+        // Możesz dostosować poniższy widok do twoich potrzeb
+        return ShoppingListsListView(
+          shoppingLists: snapshot.data!,
+          selectedButton: selectedButton,
+        );
       },
     );
   }
 }
 
 class ShoppingListsListView extends StatelessWidget {
+  String selectedButton;
   MyAuthProvider _authProvider = MyAuthProvider();
-  final AsyncSnapshot<QuerySnapshot> snapshot;
+  final List<DocumentSnapshot> shoppingLists;
   Offset? _tapPosition;
-
-  ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
+  ShoppingListsListView(
+      {Key? key, required this.shoppingLists, required this.selectedButton})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<DocumentSnapshot> shoppingLists = snapshot.data!.docs;
-
     return ListView.builder(
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
@@ -134,7 +170,7 @@ class ShoppingListsListView extends StatelessWidget {
             });
           },
           onLongPress: () {
-            _showContextMenu(context, documentId, listName);
+            _showContextMenu(context, documentId, listName, selectedButton);
           },
           onTapDown: (TapDownDetails details) {
             _tapPosition = details.globalPosition;
@@ -193,44 +229,87 @@ class ShoppingListsListView extends StatelessWidget {
     );
   }
 
-  void _showContextMenu(
-      BuildContext context, String documentId, String listname) async {
+  void _showContextMenu(BuildContext context, String documentId,
+      String listname, String selectedButton) async {
     final RenderBox? overlay =
         Overlay.of(context)?.context.findRenderObject() as RenderBox?;
 
     if (overlay is RenderBox && _tapPosition != null) {
-      await showMenu(
-        context: context,
-        position: RelativeRect.fromRect(
-            _tapPosition! &
-                const Size(40,
-                    40), // Mniejszy prostokąt, w którym nastąpiło naciśnięcie
-            Offset.zero & overlay.size // Pełny ekran
-            ),
-        items: <PopupMenuEntry>[
-          PopupMenuItem(
-            value: 'clone',
-            child: Text('Klonuj'),
-          ),
+      // Tworzenie dynamicznej listy elementów menu
+      List<PopupMenuEntry<String>> menuItems = [];
+
+      // Zawsze dodawaj opcję 'Klonuj'
+      menuItems.add(
+        PopupMenuItem(
+          value: 'clone',
+          child: Text('Klonuj'),
+        ),
+      );
+
+      // Dodaj opcję 'Udostępnij', tylko jeśli selectedButton == 'my'
+      if (selectedButton == 'my') {
+        menuItems.add(
           PopupMenuItem(
             value: 'share',
             child: Text('Udostępnij'),
           ),
-        ],
+        );
+      }
+
+      // Wyświetl menu
+      await showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            _tapPosition! & const Size(40, 40), Offset.zero & overlay.size),
+        items: menuItems,
       ).then((value) {
-        // Akcje po wyborze opcji z menu
+        // Obsługa wyboru z menu
         if (value == 'clone') {
-          print('Clone clicked');
-          // todo Logika klonowania
-          //_cloneItem();
+          // Logika klonowania
         } else if (value == 'share') {
-          print('Share clicked');
           _shareShoppingList(context, documentId, listname);
-          // print documentId;
         }
       });
     }
   }
+  // void _showContextMenu(
+  //     BuildContext context, String documentId, String listname) async {
+  //   final RenderBox? overlay =
+  //       Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+
+  //   if (overlay is RenderBox && _tapPosition != null) {
+  //     await showMenu(
+  //       context: context,
+  //       position: RelativeRect.fromRect(
+  //           _tapPosition! &
+  //               const Size(40,
+  //                   40), // Mniejszy prostokąt, w którym nastąpiło naciśnięcie
+  //           Offset.zero & overlay.size // Pełny ekran
+  //           ),
+  //       items: <PopupMenuEntry>[
+  //         PopupMenuItem(
+  //           value: 'clone',
+  //           child: Text('Klonuj'),
+  //         ),
+  //         PopupMenuItem(
+  //           value: 'share',
+  //           child: Text('Udostępnij'),
+  //         ),
+  //       ],
+  //     ).then((value) {
+  //       // Akcje po wyborze opcji z menu
+  //       if (value == 'clone') {
+  //         print('Clone clicked');
+  //         // todo Logika klonowania
+  //         //_cloneItem();
+  //       } else if (value == 'share') {
+  //         print('Share clicked');
+  //         _shareShoppingList(context, documentId, listname);
+  //         // print documentId;
+  //       }
+  //     });
+  //   }
+  // }
 
   void _shareShoppingList(
       BuildContext context, String documentId, String listname) async {
