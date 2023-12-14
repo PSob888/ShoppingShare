@@ -254,7 +254,7 @@ class ShoppingListsListView extends StatelessWidget {
         menuItems.add(
           PopupMenuItem(
             value: 'share',
-            child: Text('Udostępnij'),
+            child: Text('Udostępnianie'),
           ),
         );
       }
@@ -346,7 +346,7 @@ class ShoppingListsListView extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Udostępianie\n$listName'),
+          title: Text('Zarządzaj dostępem\n$listName'),
           content: Container(
             width: double.maxFinite,
             child: Column(
