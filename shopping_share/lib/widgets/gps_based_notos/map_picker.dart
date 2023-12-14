@@ -32,35 +32,35 @@ class _MapPickerState extends State<MapPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection:
-          TextDirection.ltr, // or TextDirection.rtl depending on your language
-      child: FutureBuilder<LatLong>(
-        future: currentPosition,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            return OpenStreetMapSearchAndPick(
-              center: snapshot.data!,
-              buttonColor: Colors.blue,
-              buttonText: 'Wybierz lokalizację sklepu',
-              onPicked: (pickedData) {
-                latitude = pickedData.latLong.latitude;
-                longitude = pickedData.latLong.longitude;
-                address = pickedData.address;
-                startBackgroundNotificationService(
-                    pickedData.address,
-                    pickedData.latLong.latitude,
-                    pickedData.latLong.longitude,
-                    widget.shoppingListId);
-                Navigator.pop(context);
-              },
-            );
-          }
-        },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Map Picker'),
+      ),
+      body: Directionality(
+        textDirection: TextDirection.ltr,
+        child: FutureBuilder<LatLong>(
+          future: currentPosition,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return OpenStreetMapSearchAndPick(
+                center: snapshot.data!,
+                buttonColor: Colors.blue,
+                buttonText: 'Pick a location',
+                onPicked: (pickedData) {
+                  latitude = pickedData.latLong.latitude;
+                  longitude = pickedData.latLong.longitude;
+                  address = pickedData.address;
+                  // Add your logic here
+                  Navigator.pop(context);
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }

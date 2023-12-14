@@ -7,6 +7,7 @@ import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
 import 'package:shopping_share/providers/MyAuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
 import 'package:intl/intl.dart';
+import 'package:shopping_share/widgets/gps_based_notos/map_picker.dart';
 
 class ShoppingListsScreen extends StatefulWidget {
   const ShoppingListsScreen({Key? key}) : super(key: key);
@@ -56,7 +57,8 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
                             ? Colors.blue
                             : Colors.grey,
                       ),
-                      child: Text("Shared", style: TextStyle(color: Colors.white)),
+                      child:
+                          Text("Shared", style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],
@@ -256,6 +258,16 @@ class ShoppingListsListView extends StatelessWidget {
         );
       }
 
+      // Gps based notos
+      if (selectedButton == 'my') {
+        menuItems.add(
+          PopupMenuItem(
+            value: 'gps',
+            child: Text('Wybierz Lokację sklepu'),
+          ),
+        );
+      }
+
       // Wyświetl menu
       await showMenu(
         context: context,
@@ -268,9 +280,20 @@ class ShoppingListsListView extends StatelessWidget {
           _cloneShoppingList(documentId, listname, context);
         } else if (value == 'share') {
           _shareShoppingList(context, documentId, listname);
+        } else if (value == 'gps') {
+          _launchMapPicker(context, documentId);
         }
       });
     }
+  }
+
+  void _launchMapPicker(BuildContext context, String documentId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapPicker(documentId),
+      ),
+    );
   }
 
   void _shareShoppingList(
