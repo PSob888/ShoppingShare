@@ -265,51 +265,13 @@ class ShoppingListsListView extends StatelessWidget {
       ).then((value) {
         // Obsługa wyboru z menu
         if (value == 'clone') {
-          // Logika klonowania
+          _cloneShoppingList(documentId, listname, context);
         } else if (value == 'share') {
           _shareShoppingList(context, documentId, listname);
         }
       });
     }
   }
-  // void _showContextMenu(
-  //     BuildContext context, String documentId, String listname) async {
-  //   final RenderBox? overlay =
-  //       Overlay.of(context)?.context.findRenderObject() as RenderBox?;
-
-  //   if (overlay is RenderBox && _tapPosition != null) {
-  //     await showMenu(
-  //       context: context,
-  //       position: RelativeRect.fromRect(
-  //           _tapPosition! &
-  //               const Size(40,
-  //                   40), // Mniejszy prostokąt, w którym nastąpiło naciśnięcie
-  //           Offset.zero & overlay.size // Pełny ekran
-  //           ),
-  //       items: <PopupMenuEntry>[
-  //         PopupMenuItem(
-  //           value: 'clone',
-  //           child: Text('Klonuj'),
-  //         ),
-  //         PopupMenuItem(
-  //           value: 'share',
-  //           child: Text('Udostępnij'),
-  //         ),
-  //       ],
-  //     ).then((value) {
-  //       // Akcje po wyborze opcji z menu
-  //       if (value == 'clone') {
-  //         print('Clone clicked');
-  //         // todo Logika klonowania
-  //         //_cloneItem();
-  //       } else if (value == 'share') {
-  //         print('Share clicked');
-  //         _shareShoppingList(context, documentId, listname);
-  //         // print documentId;
-  //       }
-  //     });
-  //   }
-  // }
 
   void _shareShoppingList(
       BuildContext context, String documentId, String listname) async {
@@ -468,5 +430,82 @@ class ShoppingListsListView extends StatelessWidget {
   String _formatDate(DateTime date) {
     // Format the DateTime as needed
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+  }
+
+  Future<String?> _askForNewListName(
+      BuildContext context, String defaultName) async {
+    TextEditingController textEditingController =
+        TextEditingController(text: defaultName);
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Klonowanie listy'),
+          content: TextField(
+            controller: textEditingController,
+            decoration: InputDecoration(hintText: 'Wpisz nową nazwę'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Anuluj'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Klonuj'),
+              onPressed: () =>
+                  Navigator.of(context).pop(textEditingController.text),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _cloneShoppingList(
+      String originalListId, String listname, BuildContext context) async {
+    String? newListName =
+        await _askForNewListName(context, listname + ' (Klon)');
+    if (newListName == null || newListName.isEmpty)
+      return; // Anuluj, jeśli nazwa nie została podana
+
+    // Krok 1: Pobierz oryginalną listę
+    DocumentSnapshot originalListSnapshot = await FirebaseFirestore.instance
+        .collection('lists')
+        .doc(originalListId)
+        .get();
+
+    Map<String, dynamic> originalListData =
+        originalListSnapshot.data() as Map<String, dynamic>;
+
+    // Krok 2: Utwórz nową listę z modyfikacjami
+    DocumentReference newListRef =
+        await FirebaseFirestore.instance.collection('lists').add({
+      'amountSpent': '0',
+      'created_at': Timestamp.now(),
+      'isDone': false,
+      'itemAmount': originalListData['itemAmount'],
+      'name': newListName,
+      'user_id': _authProvider.user!.uid,
+    });
+
+    // Krok 3: Pobierz i sklonuj przedmioty
+    QuerySnapshot itemsSnapshot = await FirebaseFirestore.instance
+        .collection('lists')
+        .doc(originalListId)
+        .collection('items')
+        .get();
+
+    for (var itemDoc in itemsSnapshot.docs) {
+      Map<String, dynamic> itemData = itemDoc.data() as Map<String, dynamic>;
+      // Utwórz nowy przedmiot z flagą 'bought' ustawioną na false
+      await newListRef.collection('items').add({
+        'bought': false,
+        'description': itemData['description'],
+        'listId': newListRef.id,
+        'name': itemData['name'],
+        'quantity': itemData['quantity'],
+      });
+    }
   }
 }

@@ -34,14 +34,49 @@ class MyAuthProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      // Handle login failure
-      print('Błąd logowania: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Błąd logowania: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (e is FirebaseAuthException) {
+        if (e.code == 'user-not-found') {
+          // Handle user not found error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Błąd logowania: Użytkownik nie istnieje'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (e.code == 'wrong-password') {
+          // Handle wrong password error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Błąd logowania: Nieprawidłowe hasło'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (e.code == 'invalid-email') {
+          // Handle invalid email format error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Błąd logowania: Źle sformatowany email'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else {
+          // Handle other types of errors
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Błąd logowania: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // Handle other types of errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Błąd logowania: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
