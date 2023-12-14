@@ -136,7 +136,7 @@ class FriendListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider _authProvider = AuthProvider();
+    MyAuthProvider _authProvider = MyAuthProvider();
     String currentUserId = _authProvider.user?.uid ?? '';
 
         return Card(
@@ -247,7 +247,7 @@ class FriendListStream2 extends StatelessWidget {
 
   FriendListStream2({required this.isFriendRequest});
 
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +332,7 @@ class FriendListTile2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider _authProvider = AuthProvider();
+    MyAuthProvider _authProvider = MyAuthProvider();
     String currentUserId = _authProvider.user?.uid ?? '';
 
     return Card(
