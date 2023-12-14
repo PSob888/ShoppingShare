@@ -265,7 +265,7 @@ class ShoppingListsListView extends StatelessWidget {
       ).then((value) {
         // Obsługa wyboru z menu
         if (value == 'clone') {
-          _cloneShoppingList(documentId);
+          _cloneShoppingList(documentId, listname, context);
         } else if (value == 'share') {
           _shareShoppingList(context, documentId, listname);
         }
@@ -432,7 +432,43 @@ class ShoppingListsListView extends StatelessWidget {
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
   }
 
-  Future<void> _cloneShoppingList(String originalListId) async {
+  Future<String?> _askForNewListName(
+      BuildContext context, String defaultName) async {
+    TextEditingController textEditingController =
+        TextEditingController(text: defaultName);
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Klonowanie listy'),
+          content: TextField(
+            controller: textEditingController,
+            decoration: InputDecoration(hintText: 'Wpisz nową nazwę'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Anuluj'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Klonuj'),
+              onPressed: () =>
+                  Navigator.of(context).pop(textEditingController.text),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _cloneShoppingList(
+      String originalListId, String listname, BuildContext context) async {
+    String? newListName =
+        await _askForNewListName(context, listname + ' (Klon)');
+    if (newListName == null || newListName.isEmpty)
+      return; // Anuluj, jeśli nazwa nie została podana
+
     // Krok 1: Pobierz oryginalną listę
     DocumentSnapshot originalListSnapshot = await FirebaseFirestore.instance
         .collection('lists')
@@ -449,7 +485,7 @@ class ShoppingListsListView extends StatelessWidget {
       'created_at': Timestamp.now(),
       'isDone': false,
       'itemAmount': originalListData['itemAmount'],
-      'name': originalListData['name'] + ' (Klon)',
+      'name': newListName,
       'user_id': _authProvider.user!.uid,
     });
 
