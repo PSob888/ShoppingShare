@@ -13,7 +13,7 @@ class AccountScreen extends StatelessWidget {
       bottomNavigationBar: BottomBar(currentIndex: 1),
       body: Column(
         children: [
-          SizedBox(height: 32),
+          SizedBox(height: 36),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
@@ -220,22 +220,24 @@ class FriendListTile extends StatelessWidget {
 
   Future<void> addFriendToUser(String userId, String friendId) async {
     try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+
+      DocumentSnapshot userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
-        List<String> friends = List<String>.from(userSnapshot['friends']);
+        List<String> friends = List<String>.from(
+            (userSnapshot.data() as Map<String, dynamic>?)?['friends'] ?? []);
 
         if (!friends.contains(friendId)) {
           friends.add(friendId);
 
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
-              .update({'friends': friends});
+          await userRef.update({'friends': friends});
         }
+      } else {
+        await userRef.set({
+          'friends': [friendId]
+        }, SetOptions(merge: true));
       }
     } catch (e) {
       print('Error adding friend to user: $e');
