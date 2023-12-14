@@ -75,8 +75,7 @@ class FriendListStream extends StatelessWidget {
         }
 
         // Filter out accepted friend requests if displaying the "Zaproszenia do znajomych" list
-        List<QueryDocumentSnapshot> filteredList = snapshot.data!.docs
-            .toList();
+        List<QueryDocumentSnapshot> filteredList = snapshot.data!.docs.toList();
 
         if (filteredList.isEmpty) {
           return Center(
@@ -135,7 +134,7 @@ class FriendListTile extends StatelessWidget {
     MyAuthProvider _authProvider = MyAuthProvider();
     String currentUserId = _authProvider.user?.uid ?? '';
 
-        return Card(
+    return Card(
       child: ListTile(
         title: FutureBuilder<String>(
           future: getEmailFromId2(friendData['friendID']),
@@ -161,38 +160,6 @@ class FriendListTile extends StatelessWidget {
             ),
           ],
         ),
-        trailing: isFriendRequest
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () {
-                      acceptFriendRequest(
-                          friendData['senderID'], friendData['receiverID']);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      denyFriendRequest(
-                          friendData['senderID'], friendData['receiverID']);
-                    },
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      removeFriend(
-                          friendData['senderID'], friendData['receiverID']);
-                    },
-                  ),
-                ],
-              ),
       ),
     );
   }
@@ -251,7 +218,7 @@ class FriendListTile extends StatelessWidget {
     }
   }
 
-    Future<String> getEmailFromId2(String userId) async {
+  Future<String> getEmailFromId2(String userId) async {
     try {
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -440,18 +407,18 @@ class FriendListTile2 extends StatelessWidget {
   Future<void> addFriendToUser(String userId, String friendId) async {
     try {
       CollectionReference friendsCollectionUser = FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('friends');
+          .collection('users')
+          .doc(userId)
+          .collection('friends');
 
       await friendsCollectionUser.add({
         'friendID': friendId,
       });
 
       CollectionReference friendsCollectionFriend = FirebaseFirestore.instance
-      .collection('users')
-      .doc(friendId)
-      .collection('friends');
+          .collection('users')
+          .doc(friendId)
+          .collection('friends');
 
       await friendsCollectionFriend.add({
         'friendID': userId,
