@@ -54,7 +54,9 @@ class _MapPickerState extends State<MapPicker> {
                   latitude = pickedData.latLong.latitude;
                   longitude = pickedData.latLong.longitude;
                   address = pickedData.address;
-                  // Add your logic here
+
+                  startBackgroundNotificationService(
+                      address, latitude, longitude, widget.shoppingListId);
                   Navigator.pop(context);
                 },
               );
@@ -83,6 +85,7 @@ class _MapPickerState extends State<MapPicker> {
             AndroidConfiguration(onStart: onStart, isForegroundMode: false),
         iosConfiguration: IosConfiguration(
             onForeground: onStart, onBackground: onIosBackground));
+    service.startService();
   }
 
   @pragma('vm:entry-point')
