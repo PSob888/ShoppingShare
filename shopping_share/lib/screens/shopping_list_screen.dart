@@ -316,6 +316,34 @@ class ShoppingListsListView extends StatelessWidget {
     _showShareDialog(context, listname, documentId, friendsList);
   }
 
+  // Funkcja do sprawdzania, czy znajomy ma dostęp do listy
+  Future<bool> hasAccess(String friendId, String listId) async {
+    var sharedListSnapshot = await FirebaseFirestore.instance
+        .collection('shared_lists')
+        .where('sharedWithUserId',
+            isEqualTo:
+                FirebaseFirestore.instance.collection('users').doc(friendId))
+        .where('listId',
+            isEqualTo:
+                FirebaseFirestore.instance.collection('lists').doc(listId))
+        .get();
+
+    return sharedListSnapshot.docs.isNotEmpty;
+  }
+
+// Funkcja do przełączania dostępu
+  Future<void> toggleAccess(
+      String friendId, String listId, bool currentlyHasAccess) async {
+    if (currentlyHasAccess) {
+      // Usuń dostęp
+      unshareList(friendId, listId).then((value) =>
+          {showToast("Znajomy został usunięty z listy", duration: 2)});
+    } else {
+      shareList(listId, _authProvider.user!.uid, friendId).then((value) =>
+          {showToast("Znajomy został dodany do listy", duration: 2)});
+    }
+  }
+
   void _showShareDialog(BuildContext context, String listName,
       String documentId, List<Map<String, String>> friends) {
     showDialog(
@@ -343,16 +371,27 @@ class ShoppingListsListView extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: friends.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(friends[index]['email'] ?? 'Brak emaila'),
-                        trailing: IconButton(
-                          icon: Icon(Icons.share),
-                          onPressed: () {
-                            // Logika udostępniania listy znajomemu
-                            _shareWithFriend(documentId,
-                                friends[index]['friendID'], listName);
-                          },
-                        ),
+                      String friendId = friends[index]['friendID'] ?? '';
+
+                      return FutureBuilder<bool>(
+                        future: hasAccess(friendId, documentId),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData)
+                            return CircularProgressIndicator();
+
+                          bool hasAccess = snapshot.data ?? false;
+                          return ListTile(
+                            title:
+                                Text(friends[index]['email'] ?? 'Brak emaila'),
+                            trailing: IconButton(
+                              icon: Icon(
+                                  hasAccess ? Icons.lock_open : Icons.lock),
+                              onPressed: () {
+                                toggleAccess(friendId, documentId, hasAccess);
+                              },
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
@@ -409,11 +448,29 @@ class ShoppingListsListView extends StatelessWidget {
     return querySnapshot.docs;
   }
 
-  Future<void> unshareList(String sharedListDocumentId) async {
-    await FirebaseFirestore.instance
+  Future<void> unshareList(String friendId, String listId) async {
+    // Najpierw znajdź dokument na podstawie friendId i listId
+    var querySnapshot = await FirebaseFirestore.instance
         .collection('shared_lists')
-        .doc(sharedListDocumentId)
-        .delete();
+        .where('sharedWithUserId',
+            isEqualTo:
+                FirebaseFirestore.instance.collection('users').doc(friendId))
+        .where('listId',
+            isEqualTo:
+                FirebaseFirestore.instance.collection('lists').doc(listId))
+        .where('ownerId',
+            isEqualTo: FirebaseFirestore.instance
+                .collection('users')
+                .doc(_authProvider.user!.uid))
+        .get();
+
+    // Jeśli dokument istnieje, usuń go
+    for (var doc in querySnapshot.docs) {
+      await FirebaseFirestore.instance
+          .collection('shared_lists')
+          .doc(doc.id)
+          .delete();
+    }
   }
 
   void showToast(String msg, {int duration = 3}) {
