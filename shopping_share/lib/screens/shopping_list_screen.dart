@@ -41,7 +41,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
                         primary:
                             selectedButton == "my" ? Colors.blue : Colors.grey,
                       ),
-                      child: Text("My"),
+                      child: Text("My", style: TextStyle(color: Colors.white)),
                     ),
                   ),
                   Expanded(
@@ -56,7 +56,7 @@ class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
                             ? Colors.blue
                             : Colors.grey,
                       ),
-                      child: Text("Shared"),
+                      child: Text("Shared", style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],
@@ -199,7 +199,7 @@ class ShoppingListsListView extends StatelessWidget {
             child: Container(
               margin: EdgeInsets.all(8.0),
               child: ListTile(
-                tileColor: primaryColor,
+                tileColor: isDone ? primaryColorDarker : primaryColor,
                 title: Text(
                   listName,
                   style: TextStyle(color: Colors.white, fontSize: 18.0),

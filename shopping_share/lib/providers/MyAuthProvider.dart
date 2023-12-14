@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class MyAuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,6 +27,10 @@ class MyAuthProvider extends ChangeNotifier {
 
       // Fetch additional user data from Firestore
       await _fetchUserData();
+
+      const storage = FlutterSecureStorage();
+      await storage.write(key: "login", value: email);
+      await storage.write(key: "password", value: password);
 
       notifyListeners();
     } catch (e) {
@@ -54,6 +59,8 @@ class MyAuthProvider extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    const storage = FlutterSecureStorage();
+    await storage.deleteAll();
     await _auth.signOut();
     _user = null;
     _userData = null;
