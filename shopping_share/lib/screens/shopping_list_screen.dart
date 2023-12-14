@@ -272,11 +272,11 @@ class ShoppingListsListView extends StatelessWidget {
       }
     }
 
-    _showShareDialog(context, listname, friendsList);
+    _showShareDialog(context, listname, documentId, friendsList);
   }
 
   void _showShareDialog(BuildContext context, String listName,
-      List<Map<String, String>> friends) {
+      String documentId, List<Map<String, String>> friends) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -308,7 +308,7 @@ class ShoppingListsListView extends StatelessWidget {
                           icon: Icon(Icons.share),
                           onPressed: () {
                             // Logika udostępniania listy znajomemu
-                            _shareWithFriend(
+                            _shareWithFriend(documentId,
                                 friends[index]['friendID'], listName);
                           },
                         ),
@@ -332,20 +332,47 @@ class ShoppingListsListView extends StatelessWidget {
     );
   }
 
-  void _shareWithFriend(String? friendId, String listName) {
+  void _shareWithFriend(String documentId, String? friendId, String listName) {
     if (friendId != null) {
       print('Udostępnianie listy "$listName" znajomemu o ID: $friendId');
-      // kod firebase do udostępniania listy znajomemu
-      // FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(friendId)
-      //     .collection('shared_lists')
-      //     .add({
-      //   'listName': listName,
-      //   'createdAt': Timestamp.now(),
-      // });
+      shareList(documentId, _authProvider.user!.uid, friendId);
       showToast("Znajomy został dodany do listy $listName", duration: 2);
     }
+  }
+
+  Future<void> shareList(
+      String listId, String ownerId, String sharedWithUserId) async {
+    DocumentReference listRef =
+        FirebaseFirestore.instance.collection('lists').doc(listId);
+    DocumentReference ownerRef =
+        FirebaseFirestore.instance.collection('users').doc(ownerId);
+    DocumentReference sharedWithUserRef =
+        FirebaseFirestore.instance.collection('users').doc(sharedWithUserId);
+
+    await FirebaseFirestore.instance.collection('shared_lists').add({
+      'listId': listRef,
+      'ownerId': ownerRef,
+      'sharedWithUserId': sharedWithUserRef,
+    });
+  }
+
+  Future<List<DocumentSnapshot>> getSharedLists(String userId) async {
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection('users').doc(userId);
+
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection('shared_lists')
+        .where('sharedWithUserId', isEqualTo: userRef)
+        .get();
+
+    return querySnapshot.docs;
+  }
+
+  Future<void> unshareList(String sharedListDocumentId) async {
+    await FirebaseFirestore.instance
+        .collection('shared_lists')
+        .doc(sharedListDocumentId)
+        .delete();
   }
 
   void showToast(String msg, {int duration = 3}) {
