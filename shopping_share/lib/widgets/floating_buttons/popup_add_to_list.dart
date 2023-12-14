@@ -19,7 +19,7 @@ class _AddToListPopupState extends State<AddToListPopup> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).viewPadding.bottom,
       ),
       child: Container(
         padding: const EdgeInsets.all(16),
