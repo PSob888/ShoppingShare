@@ -52,13 +52,10 @@ class AccountScreen extends StatelessWidget {
 }
 
 class FriendListStream extends StatelessWidget {
-
   final bool isFriendRequest;
-
   FriendListStream({required this.isFriendRequest});
-
   MyAuthProvider _authProvider = MyAuthProvider();
-  
+
   @override
   Widget build(BuildContext context) {
     String? userId = _authProvider.user?.uid ?? '';
@@ -117,7 +114,6 @@ class FriendListView extends StatelessWidget {
       itemBuilder: (context, index) {
         Map<String, dynamic> item =
             filteredList[index].data() as Map<String, dynamic>;
-
         return FriendListTile(
           friendData: item,
         );
@@ -165,6 +161,38 @@ class FriendListTile extends StatelessWidget {
             ),
           ],
         ),
+        trailing: isFriendRequest
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.check),
+                    onPressed: () {
+                      acceptFriendRequest(
+                          friendData['senderID'], friendData['receiverID']);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      denyFriendRequest(
+                          friendData['senderID'], friendData['receiverID']);
+                    },
+                  ),
+                ],
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      removeFriend(
+                          friendData['senderID'], friendData['receiverID']);
+                    },
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -390,7 +418,7 @@ class FriendListTile2 extends StatelessWidget {
     );
   }
 
-    Future<void> acceptFriendRequest(String senderId, String receiverId) async {
+  Future<void> acceptFriendRequest(String senderId, String receiverId) async {
     try {
       QuerySnapshot friendRequests = await FirebaseFirestore.instance
           .collection('friend_reqs')
