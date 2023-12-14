@@ -56,6 +56,7 @@ class _MapPickerState extends State<MapPicker> {
                     pickedData.latLong.latitude,
                     pickedData.latLong.longitude,
                     widget.shoppingListId);
+                Navigator.pop(context);
               },
             );
           }
