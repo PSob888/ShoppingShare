@@ -272,44 +272,6 @@ class ShoppingListsListView extends StatelessWidget {
       });
     }
   }
-  // void _showContextMenu(
-  //     BuildContext context, String documentId, String listname) async {
-  //   final RenderBox? overlay =
-  //       Overlay.of(context)?.context.findRenderObject() as RenderBox?;
-
-  //   if (overlay is RenderBox && _tapPosition != null) {
-  //     await showMenu(
-  //       context: context,
-  //       position: RelativeRect.fromRect(
-  //           _tapPosition! &
-  //               const Size(40,
-  //                   40), // Mniejszy prostokąt, w którym nastąpiło naciśnięcie
-  //           Offset.zero & overlay.size // Pełny ekran
-  //           ),
-  //       items: <PopupMenuEntry>[
-  //         PopupMenuItem(
-  //           value: 'clone',
-  //           child: Text('Klonuj'),
-  //         ),
-  //         PopupMenuItem(
-  //           value: 'share',
-  //           child: Text('Udostępnij'),
-  //         ),
-  //       ],
-  //     ).then((value) {
-  //       // Akcje po wyborze opcji z menu
-  //       if (value == 'clone') {
-  //         print('Clone clicked');
-  //         // todo Logika klonowania
-  //         //_cloneItem();
-  //       } else if (value == 'share') {
-  //         print('Share clicked');
-  //         _shareShoppingList(context, documentId, listname);
-  //         // print documentId;
-  //       }
-  //     });
-  //   }
-  // }
 
   void _shareShoppingList(
       BuildContext context, String documentId, String listname) async {
