@@ -209,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(buttonColor),
                     ),
-                    child: Text('Register'),
+                    child: Text('Register', style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ),

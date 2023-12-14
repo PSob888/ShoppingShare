@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_share/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,6 +14,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController repeatNewPasswordController = TextEditingController();
+  MyAuthProvider authProvider = MyAuthProvider();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -101,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('OK'),
+                                    child: Text('OK', style: TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               );
@@ -120,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('OK'),
+                                    child: Text('OK', style: TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               );
@@ -140,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('OK'),
+                                  child: Text('OK', style: TextStyle(color: Colors.white)),
                                 ),
                               ],
                             );
@@ -160,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: Text('OK'),
+                                child: Text('OK', style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           );
@@ -171,7 +173,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(buttonColor),
                   ),
-                  child: Text('Zmień hasło'),
+                  child: Text('Zmień hasło', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ),
+           // Logout button
+            FractionallySizedBox(
+              widthFactor: 0.75,
+              child: Container(
+                margin: EdgeInsets.only(top: 20),
+                height: buttonHeight,
+                decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                child: TextButton(
+                  onPressed: () async {
+                    // Call the signOut method from your AuthProvider
+                    await authProvider.signOut();
+                    // Navigate to the login or home screen after logout
+                    Navigator.pushReplacementNamed(context, '/login'); // Change '/login' to your desired route
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.red),
+                  ),
+                  child: Text('Wyloguj', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),

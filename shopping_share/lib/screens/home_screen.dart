@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
-import 'package:shopping_share/providers/AuthProvider.dart' as AuthProvider;
+import 'package:shopping_share/providers/MyAuthProvider.dart' as MyAuthProvider;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -139,8 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       String password = passwordController.text;
 
                       // You can now use the email and password variables as needed.
-                      AuthProvider.AuthProvider authProvider =
-                          Provider.of<AuthProvider.AuthProvider>(context,
+                      MyAuthProvider.MyAuthProvider authProvider =
+                          Provider.of<MyAuthProvider.MyAuthProvider>(context,
                               listen: false);
 
                       await authProvider.signInWithEmailAndPassword(
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(buttonColor),
                     ),
-                    child: Text('Zaloguj'),
+                    child: Text('Zaloguj', style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ),

@@ -45,7 +45,7 @@ class RegisterSuccess extends StatelessWidget {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(buttonColor),
                   ),
-                  child: Text('Zaloguj się'),
+                  child: Text('Zaloguj się', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 
 import 'package:shopping_share/theme.dart';
 
@@ -12,7 +12,7 @@ class AddFriendPopup extends StatefulWidget {
 class _AddFriendPopupState extends State<AddFriendPopup> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController emailController = TextEditingController();
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
 
   Future<void> addFriend(String senderID, String receiverID) async {
     try {
@@ -92,40 +92,45 @@ class _AddFriendPopupState extends State<AddFriendPopup> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Dodaj znajomego',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Dodaj znajomego',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: const InputDecoration(
-              hintText: 'Adres e-mail',
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                hintText: 'Adres e-mail',
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              String? userId = _authProvider.user?.uid;
-              if (userId != null) {
-                String friendEmail = emailController.text;
-                print(friendEmail);
-                addUserByEmail(friendEmail, userId);
-              }
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                String? userId = _authProvider.user?.uid;
+                if (userId != null) {
+                  String friendEmail = emailController.text;
+                  print(friendEmail);
+                  addUserByEmail(friendEmail, userId);
+                }
 
-              Navigator.pop(context); // Close the popup
-            },
-            child: const Text('Dodaj'),
-          ),
-        ],
+                Navigator.pop(context); // Close the popup
+              },
+              child: const Text('Dodaj', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }

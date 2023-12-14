@@ -5,7 +5,7 @@ import 'firebase_options.dart';
 import 'routes.dart';
 import 'package:shopping_share/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (context) => AuthProvider(),
+        create: (context) => MyAuthProvider(),
         child: MaterialApp(
           title: 'ShoppingShare',
           debugShowCheckedModeBanner: false,

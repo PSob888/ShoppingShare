@@ -40,6 +40,9 @@ dependencies:
   firebase_auth: ^4.14.1
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.3.6
+  intl: ^0.19.0
+  network_image_search: ^1.0.0
+  simplytranslate: ^1.2.4
 
 dev_dependencies:
   flutter_test:

@@ -3,17 +3,67 @@ import 'package:shopping_share/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 import 'package:shopping_share/widgets/floating_buttons/floating_button_callbacks.dart';
+import 'package:shopping_share/screens/list_screen.dart';
+import 'package:intl/intl.dart';
 
-class ShoppingListsScreen extends StatelessWidget {
+
+class ShoppingListsScreen extends StatefulWidget {
   const ShoppingListsScreen({Key? key}) : super(key: key);
+
+  @override
+  _ShoppingListsScreenState createState() => _ShoppingListsScreenState();
+}
+
+class _ShoppingListsScreenState extends State<ShoppingListsScreen> {
+  String selectedButton = "my";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: const BottomBar(currentIndex: 0),
-      body: ShoppingListsStream(),
+      body: Column(
+        children: [
+          Container(
+            color: Colors.grey,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = "my";
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: selectedButton == "my" ? Colors.blue : Colors.grey,
+                    ),
+                    child: Text("My"),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedButton = "shared";
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: selectedButton == "shared" ? Colors.blue : Colors.grey,
+                    ),
+                    child: Text("Shared"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ShoppingListsStream(),
+          ),
+        ],
+      ),
       backgroundColor: backgroundColor,
       floatingActionButton: CustomFAB(
         onPressed: () => FABCallbacks.createNewShoppingList(context),
@@ -23,7 +73,7 @@ class ShoppingListsScreen extends StatelessWidget {
 }
 
 class ShoppingListsStream extends StatelessWidget {
-  AuthProvider _authProvider = AuthProvider();
+  MyAuthProvider _authProvider = MyAuthProvider();
   @override
   Widget build(BuildContext context) {
     String? userId = _authProvider.user?.uid;
@@ -38,7 +88,6 @@ class ShoppingListsStream extends StatelessWidget {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        // If the data is available, build the list view
         return ShoppingListsListView(snapshot: snapshot);
       },
     );
@@ -48,42 +97,78 @@ class ShoppingListsStream extends StatelessWidget {
 class ShoppingListsListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
 
-  const ShoppingListsListView({Key? key, required this.snapshot})
-      : super(key: key);
+  const ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Extract shopping lists from the snapshot
     List<DocumentSnapshot> shoppingLists = snapshot.data!.docs;
 
     return ListView.builder(
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
-        // Extract data for each shopping list
         String listName = shoppingLists[index]['name'] ?? '';
-        return ShoppingListsCard(text: listName);
+        Timestamp createdAtTimestamp = shoppingLists[index]['created_at'] ?? Timestamp.now();
+        DateTime createdAt = createdAtTimestamp.toDate();
+        int itemAmount = shoppingLists[index]['itemAmount'] ?? 0;
+        bool isDone = shoppingLists[index]['isDone'] ?? false;
+        String documentId = shoppingLists[index].id;
+        String amountSpend = shoppingLists[index]['amountSpent'];
+
+        return GestureDetector(
+          onTap: () {
+            // Navigate to the list screen
+            Navigator.pushNamed(context, '/list', arguments: {'parameter1': listName, 'parameter2': documentId, 'parameter3': amountSpend});
+          },
+          child: Dismissible(
+            key: Key(documentId),
+            onDismissed: (direction) {
+              FirebaseFirestore.instance.collection('lists').doc(documentId).delete();
+            },
+            background: Container(
+              color: Color(0xFF8C2A35),
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 16.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            ),
+            child: Container(
+              margin: EdgeInsets.all(8.0),
+              child: ListTile(
+                tileColor: primaryColor,
+                title: Text(
+                  listName,
+                  style: TextStyle(color: Colors.white, fontSize: 18.0),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Utworzono: ${_formatDate(createdAt)}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'liczba produktów: $itemAmount',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Status: ${isDone ? "Zakończona" : "Trwająca"}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
-}
 
-class ShoppingListsCard extends StatelessWidget {
-  final String text;
-
-  const ShoppingListsCard({Key? key, required this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: primaryColor,
-      margin: EdgeInsets.all(8.0),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 18.0),
-        ),
-      ),
-    );
+  String _formatDate(DateTime date) {
+    // Format the DateTime as needed
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
   }
 }
+
