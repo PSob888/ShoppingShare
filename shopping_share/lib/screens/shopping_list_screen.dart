@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shopping_share/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/widgets/bottom_navbar.dart';
@@ -133,7 +134,7 @@ class ShoppingListsListView extends StatelessWidget {
             });
           },
           onLongPress: () {
-            _showContextMenu(context, documentId);
+            _showContextMenu(context, documentId, listName);
           },
           onTapDown: (TapDownDetails details) {
             _tapPosition = details.globalPosition;
@@ -192,7 +193,8 @@ class ShoppingListsListView extends StatelessWidget {
     );
   }
 
-  void _showContextMenu(BuildContext context, String documentId) async {
+  void _showContextMenu(
+      BuildContext context, String documentId, String listname) async {
     final RenderBox? overlay =
         Overlay.of(context)?.context.findRenderObject() as RenderBox?;
 
@@ -223,14 +225,15 @@ class ShoppingListsListView extends StatelessWidget {
           //_cloneItem();
         } else if (value == 'share') {
           print('Share clicked');
-          _shareShoppingList(documentId);
+          _shareShoppingList(context, documentId, listname);
           // print documentId;
         }
       });
     }
   }
 
-  void _shareShoppingList(String documentId) async {
+  void _shareShoppingList(
+      BuildContext context, String documentId, String listname) async {
     print('Udostępniam listę o ID: $documentId');
     String? userId = _authProvider.user?.uid;
 
@@ -245,6 +248,8 @@ class ShoppingListsListView extends StatelessWidget {
         .doc(userId)
         .collection('friends')
         .get();
+
+    List<Map<String, String>> friendsList = [];
 
     // Przechodzimy przez wszystkich znajomych
     for (var friend in friendsQuery.docs) {
@@ -261,10 +266,97 @@ class ShoppingListsListView extends StatelessWidget {
           userDoc['email']; // zakładamy, że pole nazywa się 'email'
       if (friendEmail != null) {
         print('Znajomy ID: $friendUserId, email: $friendEmail');
+        friendsList.add({'friendID': friendUserId, 'email': friendEmail});
       } else {
         print('Nie znaleziono emaila dla znajomego o ID: $friendUserId');
       }
     }
+
+    _showShareDialog(context, listname, friendsList);
+  }
+
+  void _showShareDialog(BuildContext context, String listName,
+      List<Map<String, String>> friends) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Udostępianie\n$listName'),
+          content: Container(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Lista znajomych',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: friends.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(friends[index]['email'] ?? 'Brak emaila'),
+                        trailing: IconButton(
+                          icon: Icon(Icons.share),
+                          onPressed: () {
+                            // Logika udostępniania listy znajomemu
+                            _shareWithFriend(
+                                friends[index]['friendID'], listName);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Anuluj'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Zamknij dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _shareWithFriend(String? friendId, String listName) {
+    if (friendId != null) {
+      print('Udostępnianie listy "$listName" znajomemu o ID: $friendId');
+      // kod firebase do udostępniania listy znajomemu
+      // FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(friendId)
+      //     .collection('shared_lists')
+      //     .add({
+      //   'listName': listName,
+      //   'createdAt': Timestamp.now(),
+      // });
+      showToast("Znajomy został dodany do listy $listName", duration: 2);
+    }
+  }
+
+  void showToast(String msg, {int duration = 3}) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: duration,
+        backgroundColor: Colors.grey[800],
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 
   String _formatDate(DateTime date) {

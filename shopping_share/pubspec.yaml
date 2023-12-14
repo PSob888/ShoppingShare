@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.19.0
   network_image_search: ^1.0.0
   simplytranslate: ^1.2.4
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:
