@@ -101,10 +101,11 @@ class ShoppingListsStream extends StatelessWidget {
 }
 
 class ShoppingListsListView extends StatelessWidget {
+  MyAuthProvider _authProvider = MyAuthProvider();
   final AsyncSnapshot<QuerySnapshot> snapshot;
+  Offset? _tapPosition;
 
-  const ShoppingListsListView({Key? key, required this.snapshot})
-      : super(key: key);
+  ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +131,12 @@ class ShoppingListsListView extends StatelessWidget {
               'parameter2': documentId,
               'parameter3': amountSpend
             });
+          },
+          onLongPress: () {
+            _showContextMenu(context, documentId);
+          },
+          onTapDown: (TapDownDetails details) {
+            _tapPosition = details.globalPosition;
           },
           child: Dismissible(
             key: Key(documentId),
@@ -180,6 +187,111 @@ class ShoppingListsListView extends StatelessWidget {
       },
     );
   }
+
+  void _showContextMenu(BuildContext context, String documentId) async {
+    final RenderBox? overlay =
+        Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+
+    if (overlay is RenderBox && _tapPosition != null) {
+      await showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            _tapPosition! &
+                const Size(40,
+                    40), // Mniejszy prostokąt, w którym nastąpiło naciśnięcie
+            Offset.zero & overlay.size // Pełny ekran
+            ),
+        items: <PopupMenuEntry>[
+          PopupMenuItem(
+            value: 'clone',
+            child: Text('Klonuj'),
+          ),
+          PopupMenuItem(
+            value: 'share',
+            child: Text('Udostępnij'),
+          ),
+        ],
+      ).then((value) {
+        // Akcje po wyborze opcji z menu
+        if (value == 'clone') {
+          print('Clone clicked');
+          // todo Logika klonowania
+          //_cloneItem();
+        } else if (value == 'share') {
+          print('Share clicked');
+          _shareItem(documentId);
+          // print documentId;
+        }
+      });
+    }
+  }
+
+  void _shareItem(String documentId) {
+    print('Udostępniam listę o ID: $documentId');
+    String? userId = _authProvider.user?.uid;
+
+    if (userId == null) {
+      print('Użytkownik nie jest zalogowany.');
+      return;
+    }
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('friends')
+        .get() // używamy get() zamiast snapshots(), aby pobrać dane jednorazowo
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isEmpty) {
+        print('Lista znajomych jest pusta.');
+      } else {
+        for (var doc in querySnapshot.docs) {
+          // Zapiszemy ID i email znajomego
+          String friendId = doc.id;
+          String? email = doc['email']; // zakładamy, że pole nazywa się 'email'
+          print('firend ID: $friendId, email: $email');
+        }
+      }
+    }).catchError((error) {
+      print('Wystąpił błąd podczas pobierania listy znajomych: $error');
+    });
+  }
+
+  // void _shareItem(String documentId) {
+  //   print('Udostępniam listę o ID: $documentId');
+  //   String? userId = _authProvider.user?.uid;
+
+  //   if (userId == null) {
+  //     print('Użytkownik nie jest zalogowany.');
+  //     return;
+  //   }
+
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(userId)
+  //       .collection('friends')
+  //       .get() // używamy get() zamiast snapshots(), aby pobrać dane jednorazowo
+  //       .then((QuerySnapshot querySnapshot) {
+  //     if (querySnapshot.docs.isEmpty) {
+  //       print('Lista znajomych jest pusta.');
+  //     } else {
+  //       for (var doc in querySnapshot.docs) {
+  //         print(doc.data()); // Wypisuje dane każdego dokumentu znajomego
+  //       }
+  //     }
+  //   }).catchError((error) {
+  //     print('Wystąpił błąd podczas pobierania listy znajomych: $error');
+  //   });
+  // }
+
+  // void _shareItem(String documentId) {
+  //   print('Udostępniam listę o ID: $documentId');
+  //   String? userId = _authProvider.user?.uid;
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(userId)
+  //       .collection('friends')
+  //       .snapshots();
+  // }
 
   String _formatDate(DateTime date) {
     // Format the DateTime as needed
