@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'package:shopping_share/providers/MyAuthProvider.dart' as MyAuthProvider;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -17,6 +18,38 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final _storage = const FlutterSecureStorage();
+
+  Future<int> _readFromStorage() async {
+    emailController.text = await _storage.read(key: "login") ?? '';
+    passwordController.text = await _storage.read(key: "password") ?? '';
+    return 1;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _readFromStorage().then((value) => submitHandler());
+  }
+
+  Future<void> submitHandler() async {
+    String email = emailController.text;
+    String password = passwordController.text;
+    // You can now use the email and password variables as needed.
+
+    if (email.isNotEmpty && password.isNotEmpty){
+      MyAuthProvider.MyAuthProvider authProvider =
+          Provider.of<MyAuthProvider.MyAuthProvider>(context,
+              listen: false);
+
+      await authProvider.signInWithEmailAndPassword(
+          email, password, context);
+
+      if (authProvider.user != null) {
+        Navigator.pushNamed(context, '/shopping_lists');
+      }
+    }
+  }
 
   @override
   void dispose() {
