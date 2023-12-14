@@ -107,11 +107,13 @@ class _MapPickerState extends State<MapPicker> {
             address, widget.shoppingListId); // Reminder to do the groceries
       }
     });
+    print('Service gps started');
 
     // call this when the shopping list is deleted
     service.on(eventKey).listen((event) {
       service.stopSelf();
     });
+    print('Stop endpoint registered');
   }
 
   @pragma('vm:entry-point')
