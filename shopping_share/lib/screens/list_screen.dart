@@ -184,6 +184,11 @@ class _ListListViewState extends State<ListListView> {
                             promptShown = true;
                             showAmountPrompt(context);
                           }
+                          else {
+                                FirebaseFirestore.instance.collection('lists').doc(widget.listUid).update({
+                                'isDone': true,
+                              });
+                          }
                         });
                       },
                     ),
@@ -238,6 +243,12 @@ class _ListListViewState extends State<ListListView> {
   if (amountSpent != null && amountSpent.isNotEmpty) {
     FirebaseFirestore.instance.collection('lists').doc(widget.listUid).update({
       'amountSpent': amountSpent,
+    });
+  }
+  //Update the isDone field in Firebase
+  if (amountSpent != null && amountSpent.isNotEmpty) {
+    FirebaseFirestore.instance.collection('lists').doc(widget.listUid).update({
+      'isDone': true,
     });
   }
   //update amount spent
