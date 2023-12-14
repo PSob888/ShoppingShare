@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 import 'package:geolocator/geolocator.dart';
@@ -34,31 +32,35 @@ class _MapPickerState extends State<MapPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<LatLong>(
-      future: currentPosition,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          return OpenStreetMapSearchAndPick(
-            center: snapshot.data!,
-            buttonColor: Colors.blue,
-            buttonText: 'Wybierz lokalizację sklepu',
-            onPicked: (pickedData) {
-              latitude = pickedData.latLong.latitude;
-              longitude = pickedData.latLong.longitude;
-              address = pickedData.address;
-              startBackgroundNotificationService(
-                  pickedData.address,
-                  pickedData.latLong.latitude,
-                  pickedData.latLong.longitude,
-                  widget.shoppingListId);
-            },
-          );
-        }
-      },
+    return Directionality(
+      textDirection:
+          TextDirection.ltr, // or TextDirection.rtl depending on your language
+      child: FutureBuilder<LatLong>(
+        future: currentPosition,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return OpenStreetMapSearchAndPick(
+              center: snapshot.data!,
+              buttonColor: Colors.blue,
+              buttonText: 'Wybierz lokalizację sklepu',
+              onPicked: (pickedData) {
+                latitude = pickedData.latLong.latitude;
+                longitude = pickedData.latLong.longitude;
+                address = pickedData.address;
+                startBackgroundNotificationService(
+                    pickedData.address,
+                    pickedData.latLong.latitude,
+                    pickedData.latLong.longitude,
+                    widget.shoppingListId);
+              },
+            );
+          }
+        },
+      ),
     );
   }
 
