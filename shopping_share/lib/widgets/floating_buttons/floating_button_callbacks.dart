@@ -5,11 +5,11 @@ import 'package:shopping_share/widgets/floating_buttons/popup_create_list.dart';
 import 'package:shopping_share/widgets/floating_buttons/popup_add_friend.dart';
 
 class FABCallbacks {
-  static void addToShoppingList(BuildContext context) {
+  static void addToShoppingList(BuildContext context, String listId) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return AddToListPopup();
+        return AddToListPopup(listUid: listId);
       },
     );
   }

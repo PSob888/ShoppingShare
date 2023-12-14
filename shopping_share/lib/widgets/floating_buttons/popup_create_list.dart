@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_share/providers/AuthProvider.dart';
+import 'package:shopping_share/providers/MyAuthProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shopping_share/structs/shoppinglist.dart';
 import 'package:shopping_share/theme.dart';
@@ -13,8 +13,8 @@ class CreateNewShoppingListPopup extends StatefulWidget {
 class _CreateNewShoppingListPopupState
     extends State<CreateNewShoppingListPopup> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  TextEditingController emailController = TextEditingController();
-  AuthProvider _authProvider = AuthProvider();
+  TextEditingController nameController = TextEditingController(); // Changed variable name to nameController
+  MyAuthProvider _authProvider = MyAuthProvider();
 
   Future<void> createNewShoppingList(
       String userId, String shoppingListName) async {
@@ -25,6 +25,7 @@ class _CreateNewShoppingListPopupState
         'created_at': DateTime.now(),
         'itemAmount': 0,
         'isDone': false,
+        'amountSpent': '0'
         // Add other properties as needed
       });
     } catch (e) {
@@ -34,41 +35,46 @@ class _CreateNewShoppingListPopupState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Stwórz nową listę',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).viewPadding.bottom,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Stwórz nową listę',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              hintText: 'Nazwa',
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: 'Nazwa',
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () async {
-              // TODO: Add create new shopping list
-              String? userId = _authProvider.user?.uid;
-              if (userId != null) {
-                String shoppingListName =
-                    emailController.text; // get the value from the TextField
-                await createNewShoppingList(userId, shoppingListName);
-              }
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                // TODO: Add create new shopping list
+                String? userId = _authProvider.user?.uid;
+                if (userId != null) {
+                  String shoppingListName =
+                      nameController.text; // Use the updated variable name
+                  await createNewShoppingList(userId, shoppingListName);
+                }
 
-              Navigator.pop(context); // Close the popup
-            },
-            child: const Text('Dodaj'),
-          ),
-        ],
+                Navigator.pop(context); // Close the popup
+              },
+              child: const Text('Dodaj', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }
