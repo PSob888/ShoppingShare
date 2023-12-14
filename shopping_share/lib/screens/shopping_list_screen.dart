@@ -105,7 +105,8 @@ class ShoppingListsListView extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot> snapshot;
   Offset? _tapPosition;
 
-  ShoppingListsListView({Key? key, required this.snapshot}) : super(key: key);
+  const ShoppingListsListView({Key? key, required this.snapshot})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +116,8 @@ class ShoppingListsListView extends StatelessWidget {
       itemCount: shoppingLists.length,
       itemBuilder: (context, index) {
         String listName = shoppingLists[index]['name'] ?? '';
+        Timestamp createdAtTimestamp =
+            shoppingLists[index]['created_at'] ?? Timestamp.now();
         Timestamp createdAtTimestamp =
             shoppingLists[index]['created_at'] ?? Timestamp.now();
         DateTime createdAt = createdAtTimestamp.toDate();
@@ -141,6 +144,10 @@ class ShoppingListsListView extends StatelessWidget {
           child: Dismissible(
             key: Key(documentId),
             onDismissed: (direction) {
+              FirebaseFirestore.instance
+                  .collection('lists')
+                  .doc(documentId)
+                  .delete();
               FirebaseFirestore.instance
                   .collection('lists')
                   .doc(documentId)
